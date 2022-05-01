@@ -19,15 +19,17 @@ const Game = (props) => {
 
     useEffect(() => {
 
+        console.log("test");
+
         resetBoard();
+
 
     }, []);
 
 
-    console.log(setup);
-
-
     useEffect(() => {
+
+        console.log("effect 2")
 
         // init
         if (setup !== null && current === null) {
@@ -47,41 +49,92 @@ const Game = (props) => {
     }, [board, setup, current, player1, player2]);
 
     return (
-        <div className="board">
-            <div className="board-row">
-                <div className="board-cell">
-                    {board[0]}
+        board !== null ? (
+            <div className="page">
+                <div className="top">
+                    <div className="board">
+                        <div className="board-row">
+                            <div className="board-cell">
+                                {board[0]}
+                            </div>
+                            <div className="vertical-line" />
+                            <div className="board-cell">
+                                {board[1]}
+                            </div>
+                            <div className="vertical-line" />
+                            <div className="board-cell">
+                                {board[2]}
+                            </div>
+                        </div>
+                        <div className="horizontal-line" />
+                        <div className="board-row">
+                            <div className="board-cell">
+                                {board[3]}
+                            </div>
+                            <div className="vertical-line" />
+                            <div className="board-cell">
+                                {board[4]}
+                            </div>
+                            <div className="vertical-line" />
+                            <div className="board-cell">
+                                {board[5]}
+                            </div>
+                        </div>
+                        <div className="horizontal-line" />
+                        <div className="board-row">
+                            <div className="board-cell">
+                                {board[6]}
+                            </div>
+                            <div className="vertical-line" />
+                            <div className="board-cell">
+                                {board[7]}
+                            </div>
+                            <div className="vertical-line" />
+                            <div className="board-cell">
+                                {board[8]}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div className="board-cell">
-                    {board[1]}
-                </div>
-                <div className="board-cell">
-                    {board[2]}
+                <div className="bottom">
+                    <div className="game-info">
+                        <div className="player-info blue">
+                            <div className="player-name">
+                                Jesse
+                            </div>
+                            <div className="player-options big_emoji">
+                                <div className="player-option">
+                                    ✂
+                                </div>
+                                <div className="player-option">
+                                    🗻
+                                </div>
+                                <div className="player-option">
+                                    📰
+                                </div>
+                                <div className="player-option">
+                                    ✂
+                                </div>
+                                <div className="player-option">
+                                    🗻
+                                </div>
+                                <div className="player-option">
+                                    📰
+                                </div>
+
+                            </div>
+                        </div>
+                        <div className="player-info red">
+                            <div className="player-name">
+                                Wendy
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div className="board-row">
-                <div className="board-cell">
-                    {board[3]}
-                </div>
-                <div className="board-cell">
-                    {board[4]}
-                </div>
-                <div className="board-cell">
-                    {board[5]}
-                </div>
-            </div>
-            <div className="board-row">
-                <div className="board-cell">
-                    {board[7]}
-                </div>
-                <div className="board-cell">
-                    {board[8]}
-                </div>
-                <div className="board-cell">
-                    {board[9]}
-                </div>
-            </div>
-        </div>
+        ) : (
+            null
+        )
     );
 
 
