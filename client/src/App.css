@@ -32,7 +32,57 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
+
+
+
+/* Main Manu */
+
+.MenuHeader {
+  color: black;
+  margin: auto;
+}
+
+.MenuItem {
+  text-align: center;
+  height: 10rem;
+  width: 80%;
+  font-size: 2rem;
+  margin: 1%;
+  max-width: 750px;
+}
+
+.GameTitle {
+  font-size: 4rem;
+  font-weight: bold;
+  margin-bottom: 4rem;
+}
+
+
+/* CPU select screen */
+
+.radio {
+  height: auto;
+}
+
+label.MenuItem {
+  max-width: 100%;
+}
+
+.radio input {
+  height: 2rem;
+  width: 2rem;
+  margin: 1rem; 
+}
+
+.giant_emoji {
+  font-size: 10rem;
+}
+
+
+
+/* GAME */

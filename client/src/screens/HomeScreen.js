@@ -1,5 +1,5 @@
 import React from "react";
-import MainMenu from "../components/Home/MainMenu";
+import MainMenu from "../components/MainMenu";
 
 
 function HomeScreen() {
