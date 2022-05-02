@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Game from "../components/Game";
 
 
-function HomeScreen() {
+function Cpu() {
 
     const [setup, setSetup] = useState(null);
     const [difficulty, setDifficulty] = useState("easy");
@@ -22,12 +22,11 @@ function HomeScreen() {
         }
 
         setSetup({
-            setup: {
-                player1: p1,
-                player2: p2,
-                startingPlayer: start,
-                difficulty: difficulty
-            }
+            player1: p1,
+            player2: p2,
+            startingPlayer: start,
+            difficulty: difficulty,
+            online: false
         });
     }
 
@@ -42,7 +41,7 @@ function HomeScreen() {
                 <form onSubmit={submitHandler}>
                     <div className="Menu text-center">
                         <div className="MenuHeader giant_emoji">
-                                🤖
+                            🤖
                         </div>
                         <div className="MenuItems">
                             <label className="MenuItem radio">
@@ -66,11 +65,10 @@ function HomeScreen() {
                 </form>
             ) : (
                 <Game setup={setup} />
-            )
-            }
+            )}
         </>
 
     );
 }
 
-export default HomeScreen;
+export default Cpu;
