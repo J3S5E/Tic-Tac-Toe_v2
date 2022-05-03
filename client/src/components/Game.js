@@ -14,16 +14,21 @@ const Game = (props) => {
     const [winner, setWinner] = useState(null);
 
     const minHandSize = 3;
-    const startHandSets = 2;
-    const startHandRandoms = 6;
+    const startHandSets = 1;
+    const startHandRandoms = 3;
+
+    const size = 5;
 
     function resetBoard() {
         var newBoard = [];
-        for (var i = 0; i < 9; i++) {
-            newBoard.push({
-                color: "white",
-                value: " ",
-            });
+        for (var i = 0; i < size; i++) {
+            newBoard.push([]);
+            for (var j = 0; j < size; j++) {
+                newBoard[i].push({
+                    color: "white",
+                    value: " ",
+                });
+            }
         }
         setBoard(newBoard);
     }
@@ -34,14 +39,14 @@ const Game = (props) => {
         }
     }
 
-    function checkIfValid(cell) {
+    function checkIfValid(y, x) {
         var player = getCurrent();
-        var value = board[cell].value;
+        var value = board[y][x].value;
         if (selected === null) {
             return false;
         }
 
-        if (board[cell].color === player.color && value === player.hand[selected]) {
+        if (board[y][x].color === player.color && value === player.hand[selected]) {
             return false;
         }
 
@@ -139,15 +144,46 @@ const Game = (props) => {
         }
     }
 
-    function checkIfColorMatches(cell1, cell2, cell3) {
-        if (board[cell1].color === "white") {
+    function checkIfColorMatches(array) {
+        if (array[0].color === "white") {
             return false;
         }
-        if (board[cell1].color === board[cell2].color && board[cell1].color === board[cell3].color) {
-            return true;
+        for (var i = 0; i < array.length; i++) {
+            if (array[i].color !== array[0].color) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function getRow(rowNumber) {
+        var row = [];
+        for (var i = 0; i < size; i++) {
+            row.push(board[rowNumber][i]);
+        }
+        return row;
+    }
+
+    function getColumn(columnNumber) {
+        var column = [];
+        for (var i = 0; i < size; i++) {
+            column.push(board[i][columnNumber]);
+        }
+        return column;
+    }
+
+    function getDiagonal(diagonalNumber) {
+        var diagonal = [];
+        if (diagonalNumber === 0) {
+            for (var i = 0; i < size; i++) {
+                diagonal.push(board[i][i]);
+            }
         } else {
-            return false;
+            for (var i = 0; i < size; i++) {
+                diagonal.push(board[i][size - i - 1]);
+            }
         }
+        return diagonal;
     }
 
 
@@ -155,9 +191,25 @@ const Game = (props) => {
 
         var over = false;
 
-        if (checkIfColorMatches(0, 1, 2) || checkIfColorMatches(3, 4, 5) || checkIfColorMatches(6, 7, 8) || checkIfColorMatches(0, 3, 6) || checkIfColorMatches(1, 4, 7) || checkIfColorMatches(2, 5, 8) || checkIfColorMatches(0, 4, 8) || checkIfColorMatches(2, 4, 6)) {
+        for (var i = 0; i < size; i++) {
+            var row = getRow(i);
+            if (checkIfColorMatches(row)) {
+                over = true;
+            }
+            var column = getColumn(i);
+            if (checkIfColorMatches(column)) {
+                over = true;
+            }
+        }
+        var diagonal1 = getDiagonal(0);
+        if (checkIfColorMatches(diagonal1)) {
             over = true;
         }
+        var diagonal2 = getDiagonal(1);
+        if (checkIfColorMatches(diagonal2)) {
+            over = true;
+        }
+
 
         if (over) {
             setGameover(true);
@@ -173,12 +225,12 @@ const Game = (props) => {
         swapPlayer();
     }
 
-    function handleSelect(cell) {
-        if (checkIfValid(cell) && !gameover) {
+    function handleSelect(y, x) {
+        if (checkIfValid(y, x) && !gameover) {
             var player = getCurrent();
             console.log(player)
-            board[cell].color = player.color;
-            board[cell].value = player.hand[selected];
+            board[y][x].color = player.color;
+            board[y][x].value = player.hand[selected];
 
             // remove from hand
             player.hand.splice(selected, 1);
@@ -235,57 +287,31 @@ const Game = (props) => {
             <div className="page">
                 <div className="top">
                     <div className="board">
-                        <div className="board-row">
-                            <button className={"board-cell " + board[0].color} onClick={((e) => handleSelect(0))}>
-                                {board[0].value}
-                            </button>
-                            <div className="vertical-line" />
-                            <button className={"board-cell " + board[1].color} onClick={((e) => handleSelect(1))}>
-                                {board[1].value}
-                            </button>
-                            <div className="vertical-line" />
-                            <button className={"board-cell " + board[2].color} onClick={((e) => handleSelect(2))}>
-                                {board[2].value}
-                            </button>
-                        </div>
-                        <div className="horizontal-line" />
-                        <div className="board-row">
-                            <button className={"board-cell " + board[3].color} onClick={((e) => handleSelect(3))}>
-                                {board[3].value}
-                            </button>
-                            <div className="vertical-line" />
-                            <button className={"board-cell " + board[4].color} onClick={((e) => handleSelect(4))}>
-                                {board[4].value}
-                            </button>
-                            <div className="vertical-line" />
-                            <button className={"board-cell " + board[5].color} onClick={((e) => handleSelect(5))}>
-                                {board[5].value}
-                            </button>
-                        </div>
-                        <div className="horizontal-line" />
-                        <div className="board-row">
-                            <button className={"board-cell " + board[6].color} onClick={((e) => handleSelect(6))}>
-                                {board[6].value}
-                            </button>
-                            <div className="vertical-line" />
-                            <button className={"board-cell " + board[7].color} onClick={((e) => handleSelect(7))}>
-                                {board[7].value}
-                            </button>
-                            <div className="vertical-line" />
-                            <button className={"board-cell " + board[8].color} onClick={((e) => handleSelect(8))}>
-                                {board[8].value}
-                            </button>
-                        </div>
+                        {board.map((row, rownumber) => (
+                            <>
+                                <div className="board-row" key={rownumber}>
+                                    {row.map((cell, columnnumber) => (
+                                        <>
+                                        <button key={rownumber + columnnumber} className={"board-cell " + cell.color} onClick={((e) => handleSelect(rownumber, columnnumber))}>
+                                            {cell.value}
+                                        </button>
+                                        { columnnumber !== size - 1 ? (<div className="vertical-line"></div>) : null}
+                                        </>
+                                    ))}
+                                </div>
+                                { rownumber !== size - 1 ? (<div className="horizontal-line"></div>) : null}
+                            </>
+                        ))}
                     </div>
                 </div>
                 <div className="bottom">
-                        {gameover ? (
-                            <div className="game-over">
-                                <h1>Game Over</h1>
-                                <h2>{winner} wins!</h2>
-                            </div>
-                        ) : (
-                            <>
+                    {gameover ? (
+                        <div className="game-over">
+                            <h1>Game Over</h1>
+                            <h2>{winner} wins!</h2>
+                        </div>
+                    ) : (
+                        <>
                             <div className="game-info">
                                 <div className="player-info blue">
                                     {player1 !== null ? (
@@ -319,9 +345,9 @@ const Game = (props) => {
                                         </>
                                     ) : null}
                                 </div>
-                    </div>
-                            </>
-                        )}
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         ) : (

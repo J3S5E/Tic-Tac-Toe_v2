@@ -111,8 +111,6 @@ label.MenuItem {
 
 /* board */
 .board {
-  width: 31rem;
-  height: 31rem;
   max-width: 100%;
   margin: auto;
   margin-top: 2%;
@@ -124,8 +122,8 @@ label.MenuItem {
 }
 
 .board-cell {
-  width: 33.333%;
-  height: 10rem;
+  width: 8rem;
+  height: 8rem;
   font-size: 5rem;
   display: flex;
   justify-content: center;
@@ -138,7 +136,7 @@ label.MenuItem {
 .vertical-line {
   background-color: #000;
   border: 3px solid black;
-  height: 10rem;
+  height: 8rem;
 }
 
 .horizontal-line {
@@ -164,7 +162,7 @@ label.MenuItem {
   margin-top: 2%;
   display: flex;
   /* TODO remaining height */
-  height: 20rem;
+  height: 25rem;
 }
 
 .player-info {
@@ -214,4 +212,5 @@ label.MenuItem {
   justify-content: center;
   height: 100%;
   margin-top: 10rem;
+  margin-bottom: 10rem;
 }
