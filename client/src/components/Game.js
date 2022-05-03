@@ -10,6 +10,8 @@ const Game = (props) => {
     const [player2, setPlayer2] = useState(null);
     const [current, setCurrent] = useState(null);
     const [selected, setSelected] = useState(null);
+    const [gameover, setGameover] = useState(false);
+    const [winner, setWinner] = useState(null);
 
     const minHandSize = 3;
     const startHandSets = 2;
@@ -27,7 +29,7 @@ const Game = (props) => {
     }
 
     function handleChoice(player, choice) {
-        if (player === current) {
+        if (player === current && !gameover) {
             setSelected(parseInt(choice));
         }
     }
@@ -64,7 +66,7 @@ const Game = (props) => {
             hand.push("✂");
         }
 
-        for (var i = 0; i < startHandRandoms; i++) {
+        for (i = 0; i < startHandRandoms; i++) {
             var random = Math.floor(Math.random() * 3);
             switch (random) {
                 case 0:
@@ -75,6 +77,8 @@ const Game = (props) => {
                     break;
                 case 2:
                     hand.push("✂");
+                    break;
+                default:
                     break;
             }
         }
@@ -91,10 +95,12 @@ const Game = (props) => {
     }
 
     function swapPlayer() {
-        if (current === player1.label) {
-            setCurrent(player2.label);
-        } else {
-            setCurrent(player1.label);
+        if (!gameover) {
+            if (current === player1.label) {
+                setCurrent(player2.label);
+            } else {
+                setCurrent(player1.label);
+            }
         }
     }
 
@@ -111,10 +117,12 @@ const Game = (props) => {
                 case 2:
                     player1.hand.push("✂");
                     break;
+                default:
+                    break;
             }
         }
         if (player2.hand.length < minHandSize) {
-            var random = Math.floor(Math.random() * 3);
+            random = Math.floor(Math.random() * 3);
             switch (random) {
                 case 0:
                     player2.hand.push("🗻");
@@ -125,18 +133,48 @@ const Game = (props) => {
                 case 2:
                     player2.hand.push("✂");
                     break;
+                default:
+                    break;
             }
         }
     }
 
+    function checkIfColorMatches(cell1, cell2, cell3) {
+        if (board[cell1].color === "white") {
+            return false;
+        }
+        if (board[cell1].color === board[cell2].color && board[cell1].color === board[cell3].color) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    function checkIfGameOver() {
+
+        var over = false;
+
+        if (checkIfColorMatches(0, 1, 2) || checkIfColorMatches(3, 4, 5) || checkIfColorMatches(6, 7, 8) || checkIfColorMatches(0, 3, 6) || checkIfColorMatches(1, 4, 7) || checkIfColorMatches(2, 5, 8) || checkIfColorMatches(0, 4, 8) || checkIfColorMatches(2, 4, 6)) {
+            over = true;
+        }
+
+        if (over) {
+            setGameover(true);
+            setWinner(getCurrent().label);
+        }
+
+    }
+
     function endTurn() {
+        checkIfGameOver();
         fillHands();
         setSelected(null);
         swapPlayer();
     }
 
     function handleSelect(cell) {
-        if (checkIfValid(cell)) {
+        if (checkIfValid(cell) && !gameover) {
             var player = getCurrent();
             console.log(player)
             board[cell].color = player.color;
@@ -190,7 +228,7 @@ const Game = (props) => {
 
         }
 
-    }, [board, setup]);
+    }, [board, setup, current, player1, player2]);
 
     return (
         board !== null ? (
@@ -241,40 +279,49 @@ const Game = (props) => {
                     </div>
                 </div>
                 <div className="bottom">
-                    <div className="game-info">
-                        <div className="player-info blue">
-                            {player1 !== null ? (
-                                <>
-                                    <div className={current === player1.label ? "player-name bold" : "player-name"}>
-                                        {player1.label}
-                                    </div>
-                                    <div className="player-options big_emoji">
-                                        {player1.hand.map((e, i) => (
-                                            <button key={i} className={current === player1.label && i === selected ? "player-option selected" : "player-option"} value={i} onClick={((e) => handleChoice(player1.label, e.target.value))}>
-                                                {e}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </>
-                            ) : null}
-                        </div>
-                        <div className="player-info red">
-                            {player1 !== null ? (
-                                <>
-                                    <div className={current === player2.label ? "player-name bold" : "player-name"}>
-                                        {player2.label}
-                                    </div>
-                                    <div className="player-options big_emoji">
-                                        {player2.hand.map((e, i) => (
-                                            <button key={i} className={current === player2.label && i === selected ? "player-option selected" : "player-option"} value={i} onClick={((e) => handleChoice(player2.label, e.target.value))}>
-                                                {e}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </>
-                            ) : null}
-                        </div>
+                        {gameover ? (
+                            <div className="game-over">
+                                <h1>Game Over</h1>
+                                <h2>{winner} wins!</h2>
+                            </div>
+                        ) : (
+                            <>
+                            <div className="game-info">
+                                <div className="player-info blue">
+                                    {player1 !== null ? (
+                                        <>
+                                            <div className={current === player1.label ? "player-name bold" : "player-name"}>
+                                                {player1.label}
+                                            </div>
+                                            <div className="player-options big_emoji">
+                                                {player1.hand.map((e, i) => (
+                                                    <button key={i} className={current === player1.label && i === selected ? "player-option selected" : "player-option"} value={i} onClick={((e) => handleChoice(player1.label, e.target.value))}>
+                                                        {e}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </>
+                                    ) : null}
+                                </div>
+                                <div className="player-info red">
+                                    {player1 !== null ? (
+                                        <>
+                                            <div className={current === player2.label ? "player-name bold" : "player-name"}>
+                                                {player2.label}
+                                            </div>
+                                            <div className="player-options big_emoji">
+                                                {player2.hand.map((e, i) => (
+                                                    <button key={i} className={current === player2.label && i === selected ? "player-option selected" : "player-option"} value={i} onClick={((e) => handleChoice(player2.label, e.target.value))}>
+                                                        {e}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </>
+                                    ) : null}
+                                </div>
                     </div>
+                            </>
+                        )}
                 </div>
             </div>
         ) : (
