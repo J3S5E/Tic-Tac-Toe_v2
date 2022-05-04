@@ -8,16 +8,18 @@ const Game = (props) => {
     const [board, setBoard] = useState(null);
     const [player1, setPlayer1] = useState(null);
     const [player2, setPlayer2] = useState(null);
-    const [current, setCurrent] = useState(null);
+    const [currentPlayer, setCurrentPlayer] = useState(null);
     const [selected, setSelected] = useState(null);
-    const [gameover, setGameover] = useState(false);
+    const [gameOver, setGameOver] = useState(false);
     const [winner, setWinner] = useState(null);
+    const [zoom, setZoom] = useState(null);
 
     const minHandSize = 3;
+    const amountToAdd = 1;
     const startHandSets = 1;
     const startHandRandoms = 3;
 
-    const size = 5;
+    const size = 6;
 
     function resetBoard() {
         var newBoard = [];
@@ -34,7 +36,7 @@ const Game = (props) => {
     }
 
     function handleChoice(player, choice) {
-        if (player === current && !gameover) {
+        if (player === currentPlayer && !gameOver) {
             setSelected(parseInt(choice));
         }
     }
@@ -63,6 +65,23 @@ const Game = (props) => {
         return true;
     }
 
+    function addRandomToHand(hand) {
+        var random = Math.floor(Math.random() * 3);
+        switch (random) {
+            case 0:
+                hand.push("🗻");
+                break;
+            case 1:
+                hand.push("📰");
+                break;
+            case 2:
+                hand.push("✂");
+                break;
+            default:
+                break;
+        }
+    }
+
     function makeStartHand() {
         var hand = [];
         for (var i = 0; i < startHandSets; i++) {
@@ -72,26 +91,13 @@ const Game = (props) => {
         }
 
         for (i = 0; i < startHandRandoms; i++) {
-            var random = Math.floor(Math.random() * 3);
-            switch (random) {
-                case 0:
-                    hand.push("🗻");
-                    break;
-                case 1:
-                    hand.push("📰");
-                    break;
-                case 2:
-                    hand.push("✂");
-                    break;
-                default:
-                    break;
-            }
+            addRandomToHand(hand);
         }
         return hand;
     }
 
     function getCurrent() {
-        if (current === player1.label) {
+        if (currentPlayer === player1.label) {
             return player1;
         } else {
             return player2;
@@ -100,46 +106,24 @@ const Game = (props) => {
     }
 
     function swapPlayer() {
-        if (!gameover) {
-            if (current === player1.label) {
-                setCurrent(player2.label);
+        if (!gameOver) {
+            if (currentPlayer === player1.label) {
+                setCurrentPlayer(player2.label);
             } else {
-                setCurrent(player1.label);
+                setCurrentPlayer(player1.label);
             }
         }
     }
 
     function fillHands() {
         if (player1.hand.length < minHandSize) {
-            var random = Math.floor(Math.random() * 3);
-            switch (random) {
-                case 0:
-                    player1.hand.push("🗻");
-                    break;
-                case 1:
-                    player1.hand.push("📰");
-                    break;
-                case 2:
-                    player1.hand.push("✂");
-                    break;
-                default:
-                    break;
+            for (var i = 0; i < amountToAdd; i++) {
+                addRandomToHand(player1.hand);
             }
         }
         if (player2.hand.length < minHandSize) {
-            random = Math.floor(Math.random() * 3);
-            switch (random) {
-                case 0:
-                    player2.hand.push("🗻");
-                    break;
-                case 1:
-                    player2.hand.push("📰");
-                    break;
-                case 2:
-                    player2.hand.push("✂");
-                    break;
-                default:
-                    break;
+            for (var i = 0; i < amountToAdd; i++) {
+                addRandomToHand(player2.hand);
             }
         }
     }
@@ -179,7 +163,7 @@ const Game = (props) => {
                 diagonal.push(board[i][i]);
             }
         } else {
-            for (var i = 0; i < size; i++) {
+            for (i = 0; i < size; i++) {
                 diagonal.push(board[i][size - i - 1]);
             }
         }
@@ -212,7 +196,7 @@ const Game = (props) => {
 
 
         if (over) {
-            setGameover(true);
+            setGameOver(true);
             setWinner(getCurrent().label);
         }
 
@@ -226,7 +210,7 @@ const Game = (props) => {
     }
 
     function handleSelect(y, x) {
-        if (checkIfValid(y, x) && !gameover) {
+        if (checkIfValid(y, x) && !gameOver) {
             var player = getCurrent();
             console.log(player)
             board[y][x].color = player.color;
@@ -239,18 +223,53 @@ const Game = (props) => {
         }
     }
 
+    function setDefaultMagnification() {
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+
+        // calculate 1rem height
+        var oneRemWidth = width / 16;
+        var remWidthRounded = Math.ceil(oneRemWidth / 10);
+
+        var oneRemHeight = height / 16;
+        var remHeightRounded = Math.ceil(oneRemHeight / 10);
+
+        var newSize = remWidthRounded;
+        if (remWidthRounded > remHeightRounded) {
+            newSize = remHeightRounded;
+        }
+
+        setZoom(newSize);
+
+    }
+
+
     useEffect(() => {
 
         resetBoard();
 
+        setDefaultMagnification();
 
     }, []);
 
 
     useEffect(() => {
+        if (zoom === null) {
+            setDefaultMagnification();
+        }
+        else if (zoom < 1) {
+            setZoom(1);
+        }
+        else if (zoom > 16) {
+            setZoom(16);
+        }
+    }, [zoom]);
+
+
+    useEffect(() => {
 
         // init
-        if ((setup !== null || setup !== undefined) && (current === null || current === undefined)) {
+        if ((setup !== null || setup !== undefined) && (currentPlayer === null || currentPlayer === undefined)) {
 
             var startHand = makeStartHand();
 
@@ -271,41 +290,49 @@ const Game = (props) => {
             if (player1 !== null && player2 !== null) {
 
                 if (setup.startingPlayer === "P1") {
-                    setCurrent(player1.label);
+                    setCurrentPlayer(player1.label);
                 } else {
-                    setCurrent(player2.label);
+                    setCurrentPlayer(player2.label);
                 }
 
             }
 
         }
 
-    }, [board, setup, current, player1, player2]);
+    }, [board, setup, currentPlayer, player1, player2]);
 
     return (
         board !== null ? (
             <div className="page">
                 <div className="top">
+                    <div className="banner">
+                        <button className="zoom-out" onClick={((e) => setZoom(zoom - 1))}>
+                            🔍-
+                        </button>
+                        <button className="zoom-in" onClick={((e) => setZoom(zoom + 1))}>
+                            +🔎
+                        </button>
+                    </div>
                     <div className="board">
                         {board.map((row, rownumber) => (
                             <>
                                 <div className="board-row" key={rownumber}>
                                     {row.map((cell, columnnumber) => (
                                         <>
-                                        <button key={rownumber + columnnumber} className={"board-cell " + cell.color} onClick={((e) => handleSelect(rownumber, columnnumber))}>
-                                            {cell.value}
-                                        </button>
-                                        { columnnumber !== size - 1 ? (<div className="vertical-line"></div>) : null}
+                                            <button key={rownumber + columnnumber} className={"board-cell " + cell.color + " size" + zoom} onClick={((e) => handleSelect(rownumber, columnnumber))}>
+                                                {cell.value}
+                                            </button>
+                                            {columnnumber !== size - 1 ? (<div className="vertical-line"></div>) : null}
                                         </>
                                     ))}
                                 </div>
-                                { rownumber !== size - 1 ? (<div className="horizontal-line"></div>) : null}
+                                {rownumber !== size - 1 ? (<div className="horizontal-line"></div>) : null}
                             </>
                         ))}
                     </div>
                 </div>
                 <div className="bottom">
-                    {gameover ? (
+                    {gameOver ? (
                         <div className="game-over">
                             <h1>Game Over</h1>
                             <h2>{winner} wins!</h2>
@@ -316,12 +343,12 @@ const Game = (props) => {
                                 <div className="player-info blue">
                                     {player1 !== null ? (
                                         <>
-                                            <div className={current === player1.label ? "player-name bold" : "player-name"}>
+                                            <div className={currentPlayer === player1.label ? "player-name bold" : "player-name"}>
                                                 {player1.label}
                                             </div>
                                             <div className="player-options big_emoji">
                                                 {player1.hand.map((e, i) => (
-                                                    <button key={i} className={current === player1.label && i === selected ? "player-option selected" : "player-option"} value={i} onClick={((e) => handleChoice(player1.label, e.target.value))}>
+                                                    <button key={i} className={currentPlayer === player1.label && i === selected ? "player-option selected" : "player-option"} value={i} onClick={((e) => handleChoice(player1.label, e.target.value))}>
                                                         {e}
                                                     </button>
                                                 ))}
@@ -332,12 +359,12 @@ const Game = (props) => {
                                 <div className="player-info red">
                                     {player1 !== null ? (
                                         <>
-                                            <div className={current === player2.label ? "player-name bold" : "player-name"}>
+                                            <div className={currentPlayer === player2.label ? "player-name bold" : "player-name"}>
                                                 {player2.label}
                                             </div>
                                             <div className="player-options big_emoji">
                                                 {player2.hand.map((e, i) => (
-                                                    <button key={i} className={current === player2.label && i === selected ? "player-option selected" : "player-option"} value={i} onClick={((e) => handleChoice(player2.label, e.target.value))}>
+                                                    <button key={i} className={currentPlayer === player2.label && i === selected ? "player-option selected" : "player-option"} value={i} onClick={((e) => handleChoice(player2.label, e.target.value))}>
                                                         {e}
                                                     </button>
                                                 ))}

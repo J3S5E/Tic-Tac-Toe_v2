@@ -109,6 +109,28 @@ label.MenuItem {
   width: 100%;
 }
 
+.banner {
+  height: 6vh;
+}
+
+.zoom-out {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 5vh;
+  background-color: rgba(0, 0, 0, 0);
+  border: 0px;
+}
+
+.zoom-in {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 5vh;
+  background-color: rgba(0, 0, 0, 0);
+  border: 0px;
+}
+
 /* board */
 .board {
   max-width: 100%;
@@ -122,21 +144,17 @@ label.MenuItem {
 }
 
 .board-cell {
-  width: 8rem;
-  height: 8rem;
-  font-size: 5rem;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
   background-color: rgba(0, 0, 0, 0);
-  border: 0px solid black;
+  border: 3px solid rgba(0, 0, 0, 0);
 }
 
 .vertical-line {
   background-color: #000;
   border: 3px solid black;
-  height: 8rem;
 }
 
 .horizontal-line {
@@ -211,6 +229,6 @@ label.MenuItem {
   align-items: center;
   justify-content: center;
   height: 100%;
-  margin-top: 10rem;
-  margin-bottom: 10rem;
+  margin-top: 5rem;
+  margin-bottom: 2.5rem;
 }
