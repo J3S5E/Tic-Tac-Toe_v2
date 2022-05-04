@@ -212,7 +212,6 @@ const Game = (props) => {
     function handleSelect(y, x) {
         if (checkIfValid(y, x) && !gameOver) {
             var player = getCurrent();
-            console.log(player)
             board[y][x].color = player.color;
             board[y][x].value = player.hand[selected];
 
