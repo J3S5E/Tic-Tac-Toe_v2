@@ -122,7 +122,7 @@ const Game = (props) => {
             }
         }
         if (player2.hand.length < minHandSize) {
-            for (var i = 0; i < amountToAdd; i++) {
+            for (i = 0; i < amountToAdd; i++) {
                 addRandomToHand(player2.hand);
             }
         }
@@ -316,10 +316,10 @@ const Game = (props) => {
                     <div className="board">
                         {board.map((row, rownumber) => (
                             <>
-                                <div className="board-row" key={rownumber}>
+                                <div className="board-row">
                                     {row.map((cell, columnnumber) => (
                                         <>
-                                            <button key={rownumber + columnnumber} className={"board-cell " + cell.color + " size" + zoom} onClick={((e) => handleSelect(rownumber, columnnumber))}>
+                                            <button className={"board-cell " + cell.color + " size" + zoom} onClick={((e) => handleSelect(rownumber, columnnumber))}>
                                                 {cell.value}
                                             </button>
                                             {columnnumber !== size - 1 ? (<div className="vertical-line"></div>) : null}
