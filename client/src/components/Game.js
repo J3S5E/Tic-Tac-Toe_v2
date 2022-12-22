@@ -339,7 +339,7 @@ const Game = (props) => {
                     ) : (
                         <>
                             <div className="game-info">
-                                <div className="player-info blue">
+                                <div className="player-info">
                                     {player1 !== null ? (
                                         <>
                                             <div className={currentPlayer === player1.label ? "player-name bold" : "player-name"}>
@@ -355,7 +355,7 @@ const Game = (props) => {
                                         </>
                                     ) : null}
                                 </div>
-                                <div className="player-info red">
+                                <div className="player-info">
                                     {player1 !== null ? (
                                         <>
                                             <div className={currentPlayer === player2.label ? "player-name bold" : "player-name"}>
