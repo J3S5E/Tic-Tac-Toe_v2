@@ -8,7 +8,6 @@ interface Setup {
 }
 
 function Cpu() {
-
     const [setup, setSetup] = useState<Setup | null>(null);
     const [difficulty, setDifficulty] = useState("easy");
 
@@ -23,7 +22,6 @@ function Cpu() {
     }
 
     function handleDifficulty() {
-
         const start = Math.random() > 0.5 ? "P1" : "P2";
 
         let p1 = "HUMAN";
@@ -36,11 +34,11 @@ function Cpu() {
         setSetup({
             player1: p1,
             player2: p2,
-            startingPlayer: start
+            startingPlayer: start,
         });
     }
 
-    const submitHandler = (e: { preventDefault: () => void; }) => {
+    const submitHandler = (e: { preventDefault: () => void }) => {
         e.preventDefault();
         handleDifficulty();
     };
@@ -50,34 +48,63 @@ function Cpu() {
             {setup === null ? (
                 <form onSubmit={submitHandler}>
                     <div className="Menu text-center">
-                        <div className="MenuHeader giant_emoji">
-                            🤖
-                        </div>
+                        <div className="MenuHeader giant_emoji">🤖</div>
                         <div className="MenuItems">
                             <label className="MenuItem radio">
-                                <input type="radio" name="difficulty" value="easy" checked={difficulty === "easy"} onChange={((e) => setDifficulty(e.target.value))} />
+                                <input
+                                    type="radio"
+                                    name="difficulty"
+                                    value="easy"
+                                    checked={difficulty === "easy"}
+                                    onChange={(e) =>
+                                        setDifficulty(e.target.value)
+                                    }
+                                />
                                 Easy
                             </label>
                             <label className="MenuItem radio">
-                                <input type="radio" name="difficulty" value="med" checked={difficulty === "med"} onChange={((e) => setDifficulty(e.target.value))} />
+                                <input
+                                    type="radio"
+                                    name="difficulty"
+                                    value="med"
+                                    checked={difficulty === "med"}
+                                    onChange={(e) =>
+                                        setDifficulty(e.target.value)
+                                    }
+                                />
                                 Medium
                             </label>
                             <label className="MenuItem radio">
-                                <input type="radio" name="difficulty" value="hard" checked={difficulty === "hard"} onChange={((e) => setDifficulty(e.target.value))} />
+                                <input
+                                    type="radio"
+                                    name="difficulty"
+                                    value="hard"
+                                    checked={difficulty === "hard"}
+                                    onChange={(e) =>
+                                        setDifficulty(e.target.value)
+                                    }
+                                />
                                 Hard
                             </label>
 
-                            <button type="submit" className="MenuItem btn-default">
+                            <button
+                                type="submit"
+                                className="MenuItem btn-default"
+                            >
                                 Start
                             </button>
                         </div>
                     </div>
                 </form>
             ) : (
-                <Game setup={setup} playerTurn={getIfPlayerTurn} gameState={getGameState} />
+                <Game
+                    setup={setup}
+                    playerTurn={getIfPlayerTurn}
+                    gameState={getGameState}
+                    options={null}
+                />
             )}
         </>
-
     );
 }
 
