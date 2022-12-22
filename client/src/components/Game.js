@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 const Game = (props) => {
 
 
-    const { setup, playerTurn, getGameState } = props;
+    const { setup, playerTurn, getGameState, options } = props;
 
     const [board, setBoard] = useState(null);
     const [player1, setPlayer1] = useState(null);
@@ -14,9 +14,8 @@ const Game = (props) => {
     const [winner, setWinner] = useState(null);
     const [zoom, setZoom] = useState(null);
 
-    const minHandSize = 3;
-
-    const size = 5;
+    const minHandSize = options.minHandSize;
+    const size = options.size;
 
     function divideAndRoundUp(a, b) {
         return Math.ceil(a / b);

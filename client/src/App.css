@@ -73,6 +73,25 @@ body {
 }
 
 
+/* options menu */
+
+.OptionsMenu {
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+  grid-gap: 1rem;
+}
+
+.OptionsItem {
+  text-align: center;
+  height: auto;
+  width: 80%;
+  font-size: 2rem;
+  margin: 1%;
+  max-width: 750px;
+}
+
+
 /* CPU select screen */
 
 .radio {

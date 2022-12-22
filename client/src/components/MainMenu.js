@@ -13,18 +13,18 @@ function MainMenu() {
                     ❌'s and ⭕'s
                 </div>
                 <div className="MenuItems">
-                    <Link to="/cpu">
-                        <button className="MenuItem btn-default">
-                            Play Against a Computer
-                        </button>
-                    </Link>
                     <Link to="/local">
                         <button className="MenuItem btn-success">
                             Play Against a Friend Locally
                         </button>
                     </Link>
+                    <Link to="/cpu">
+                        <button className="MenuItem btn-default" disabled={true}>
+                            Play Against a Computer
+                        </button>
+                    </Link>
                     <Link to="/find">
-                        <button className="MenuItem btn-danger">
+                        <button className="MenuItem btn-danger" disabled={true}>
                             Play Against a Person Online
                         </button>
                     </Link>

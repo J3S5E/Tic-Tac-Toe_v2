@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Game from "../components/Game";
-
+import Options from "../components/Options";
 
 function Local() {
-
     const [setup, setSetup] = useState(null);
+    const [gameOptions, setGameOptions] = useState(null);
 
     async function getIfPlayerTurn() {
         return true;
@@ -15,19 +15,15 @@ function Local() {
     }
 
     function init() {
+        const start = Math.random() > 0.5 ? "P1" : "P2";
 
-        var start = "P1";
-        if (Math.random() > 0.5) {
-            start = "P2";
-        }
-
-        var p1 = "PLAYER 1";
-        var p2 = "PLAYER 2";
+        const p1 = "PLAYER 1";
+        const p2 = "PLAYER 2";
 
         setSetup({
             player1: p1,
             player2: p2,
-            startingPlayer: start
+            startingPlayer: start,
         });
     }
 
@@ -35,17 +31,19 @@ function Local() {
         init();
     }, []);
 
-
-
     return (
         <>
-            {setup === null ? (
-                null
+            {setup === null || gameOptions === null ? (
+                <Options setOptions={setGameOptions} />
             ) : (
-                <Game setup={setup} playerTurn={getIfPlayerTurn} gameState={getGameState} />
+                <Game
+                    setup={setup}
+                    playerTurn={getIfPlayerTurn}
+                    gameState={getGameState}
+                    options={gameOptions}
+                />
             )}
         </>
-
     );
 }
 
