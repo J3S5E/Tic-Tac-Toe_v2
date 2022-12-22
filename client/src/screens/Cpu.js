@@ -7,6 +7,16 @@ function Cpu() {
     const [setup, setSetup] = useState(null);
     const [difficulty, setDifficulty] = useState("easy");
 
+    async function getIfPlayerTurn() {
+        // TODO: get if player turn from server
+        return true;
+    }
+
+    async function getGameState() {
+        // TODO: get game state from server
+        return false;
+    }
+
     function handleDifficulty() {
 
         var start = "P1";
@@ -24,9 +34,7 @@ function Cpu() {
         setSetup({
             player1: p1,
             player2: p2,
-            startingPlayer: start,
-            difficulty: difficulty,
-            online: false
+            startingPlayer: start
         });
     }
 
@@ -64,7 +72,7 @@ function Cpu() {
                     </div>
                 </form>
             ) : (
-                <Game setup={setup} />
+                <Game setup={setup} playerTurn={getIfPlayerTurn} gameState={getGameState} />
             )}
         </>
 

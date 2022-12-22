@@ -6,6 +6,14 @@ function Local() {
 
     const [setup, setSetup] = useState(null);
 
+    async function getIfPlayerTurn() {
+        return true;
+    }
+
+    async function getGameState() {
+        return false;
+    }
+
     function init() {
 
         var start = "P1";
@@ -19,8 +27,7 @@ function Local() {
         setSetup({
             player1: p1,
             player2: p2,
-            startingPlayer: start,
-            online: false
+            startingPlayer: start
         });
     }
 
@@ -29,12 +36,13 @@ function Local() {
     }, []);
 
 
+
     return (
         <>
             {setup === null ? (
                 null
             ) : (
-                <Game setup={setup} />
+                <Game setup={setup} playerTurn={getIfPlayerTurn} gameState={getGameState} />
             )}
         </>
 

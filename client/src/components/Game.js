@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 const Game = (props) => {
 
 
-    const { setup } = props;
+    const { setup, playerTurn, getGameState } = props;
 
     const [board, setBoard] = useState(null);
     const [player1, setPlayer1] = useState(null);
@@ -15,11 +15,12 @@ const Game = (props) => {
     const [zoom, setZoom] = useState(null);
 
     const minHandSize = 3;
-    const amountToAdd = 1;
-    const startHandSets = 1;
-    const startHandRandoms = 3;
 
-    const size = 6;
+    const size = 5;
+
+    function divideAndRoundUp(a, b) {
+        return Math.ceil(a / b);
+    }
 
     function resetBoard() {
         var newBoard = [];
@@ -84,13 +85,13 @@ const Game = (props) => {
 
     function makeStartHand() {
         var hand = [];
-        for (var i = 0; i < startHandSets; i++) {
+        for (var i = 0; i < (divideAndRoundUp((size - 2), 3)); i++) {
             hand.push("🗻");
             hand.push("📰");
             hand.push("✂");
         }
 
-        for (i = 0; i < startHandRandoms; i++) {
+        for (i = 0; i < size; i++) {
             addRandomToHand(hand);
         }
         return hand;
@@ -117,12 +118,12 @@ const Game = (props) => {
 
     function fillHands() {
         if (player1.hand.length < minHandSize) {
-            for (var i = 0; i < amountToAdd; i++) {
+            for (var i = 0; i < (divideAndRoundUp(size, 3)); i++) {
                 addRandomToHand(player1.hand);
             }
         }
         if (player2.hand.length < minHandSize) {
-            for (i = 0; i < amountToAdd; i++) {
+            for (i = 0; i < divideAndRoundUp(size, 3); i++) {
                 addRandomToHand(player2.hand);
             }
         }
@@ -209,8 +210,9 @@ const Game = (props) => {
         swapPlayer();
     }
 
-    function handleSelect(y, x) {
-        if (checkIfValid(y, x) && !gameOver) {
+    async function handleSelect(y, x) {
+        const pTurn = await playerTurn()
+        if (checkIfValid(y, x) && !gameOver && pTurn) {
             var player = getCurrent();
             board[y][x].color = player.color;
             board[y][x].value = player.hand[selected];
@@ -219,6 +221,8 @@ const Game = (props) => {
             player.hand.splice(selected, 1);
 
             endTurn();
+        } else {
+            await getGameState();
         }
     }
 
@@ -298,11 +302,13 @@ const Game = (props) => {
 
         }
 
+        // eslint-disable-next-line
     }, [board, setup, currentPlayer, player1, player2]);
 
     return (
         board !== null ? (
-            <div className="page">
+            <div className="game-page">
+                <div className="game-colors"/>
                 <div className="top">
                     <div className="banner">
                         <button className="zoom-out" onClick={((e) => setZoom(zoom - 1))}>
@@ -313,19 +319,19 @@ const Game = (props) => {
                         </button>
                     </div>
                     <div className="board">
-                        {board.map((row, rownumber) => (
+                        {board.map((row, rowNumber) => (
                             <>
                                 <div className="board-row">
-                                    {row.map((cell, columnnumber) => (
+                                    {row.map((cell, columnNumber) => (
                                         <>
-                                            <button className={"board-cell " + cell.color + " size" + zoom} onClick={((e) => handleSelect(rownumber, columnnumber))}>
+                                            <button className={"board-cell " + cell.color + " size" + zoom} onClick={((e) => handleSelect(rowNumber, columnNumber))}>
                                                 {cell.value}
                                             </button>
-                                            {columnnumber !== size - 1 ? (<div className="vertical-line"></div>) : null}
+                                            {columnNumber !== size - 1 ? (<div className="vertical-line"/>) : null}
                                         </>
                                     ))}
                                 </div>
-                                {rownumber !== size - 1 ? (<div className="horizontal-line"></div>) : null}
+                                {rowNumber !== size - 1 ? (<div className="horizontal-line"/>) : null}
                             </>
                         ))}
                     </div>
