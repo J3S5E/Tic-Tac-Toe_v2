@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 
-const Options = (props) => {
-    const [size, setSize] = useState("3");
-    const [minHandSize, setMinHandSize] = useState("3");
+const Options = (props: {
+    setOptions: (arg0: { size: number; minHandSize: number }) => void;
+}) => {
+    const [size, setSize] = useState(3);
+    const [minHandSize, setMinHandSize] = useState(3);
 
-    const submitHandler = (e) => {
+    const submitHandler = (e: { preventDefault: () => void }) => {
         e.preventDefault();
 
         // TODO: zod validation
@@ -15,11 +17,16 @@ const Options = (props) => {
         });
     };
 
-    function changeGrid(value) {
-        setSize(value);
-        if (minHandSize > value * 2) {
-            setMinHandSize(value * 2);
+    function changeGrid(value: string) {
+        const num = parseInt(value);
+        setSize(num);
+        if (minHandSize > num * 2) {
+            setMinHandSize(num * 2);
         }
+    }
+
+    function changeHandSize(value: string) {
+        setMinHandSize(parseInt(value));
     }
 
     return (
@@ -54,7 +61,7 @@ const Options = (props) => {
                                 min="1"
                                 max={size * 2}
                                 step={1}
-                                onChange={(e) => setMinHandSize(e.target.value)}
+                                onChange={(e) => changeHandSize(e.target.value)}
                             />
                         </label>
                         <label className="OptionsItem value">{`${minHandSize} cards`}</label>

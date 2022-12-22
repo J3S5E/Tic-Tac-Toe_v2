@@ -2,9 +2,20 @@ import React, { useState, useEffect } from "react";
 import Game from "../components/Game";
 import Options from "../components/Options";
 
+interface GameOptions {
+    size: number;
+    minHandSize: number;
+}
+
+interface Setup {
+    player1: string;
+    player2: string;
+    startingPlayer: "P1" | "P2";
+}
+
 function Local() {
-    const [setup, setSetup] = useState(null);
-    const [gameOptions, setGameOptions] = useState(null);
+    const [setup, setSetup] = useState<Setup | null>(null);
+    const [gameOptions, setGameOptions] = useState<GameOptions | null>(null);
 
     async function getIfPlayerTurn() {
         return true;
@@ -14,7 +25,7 @@ function Local() {
         return false;
     }
 
-    function init(gameOptions) {
+    function init(gameOptions: GameOptions | null) {
         const start = Math.random() > 0.5 ? "P1" : "P2";
 
         const p1 = "PLAYER 1";

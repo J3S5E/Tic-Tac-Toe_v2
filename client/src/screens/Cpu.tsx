@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import Game from "../components/Game";
 
+interface Setup {
+    player1: string;
+    player2: string;
+    startingPlayer: "P1" | "P2";
+}
 
 function Cpu() {
 
-    const [setup, setSetup] = useState(null);
+    const [setup, setSetup] = useState<Setup | null>(null);
     const [difficulty, setDifficulty] = useState("easy");
 
     async function getIfPlayerTurn() {
@@ -19,13 +24,10 @@ function Cpu() {
 
     function handleDifficulty() {
 
-        var start = "P1";
-        if (Math.random() > 0.5) {
-            start = "P2";
-        }
+        const start = Math.random() > 0.5 ? "P1" : "P2";
 
-        var p1 = "HUMAN";
-        var p2 = "CPU";
+        let p1 = "HUMAN";
+        let p2 = "CPU";
         if (Math.random() > 0.5) {
             p1 = "CPU";
             p2 = "HUMAN";
@@ -38,7 +40,7 @@ function Cpu() {
         });
     }
 
-    const submitHandler = (e) => {
+    const submitHandler = (e: { preventDefault: () => void; }) => {
         e.preventDefault();
         handleDifficulty();
     };
