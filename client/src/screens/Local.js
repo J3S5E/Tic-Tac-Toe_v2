@@ -14,7 +14,7 @@ function Local() {
         return false;
     }
 
-    function init() {
+    function init(gameOptions) {
         const start = Math.random() > 0.5 ? "P1" : "P2";
 
         const p1 = "PLAYER 1";
@@ -25,11 +25,14 @@ function Local() {
             player2: p2,
             startingPlayer: start,
         });
+
+        // TODO: make start game state
+        
     }
 
     useEffect(() => {
-        init();
-    }, []);
+        init(gameOptions);
+    }, [gameOptions]);
 
     return (
         <>
