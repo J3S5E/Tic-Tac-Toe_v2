@@ -1,20 +1,41 @@
 import React, { useState } from "react";
+import { z } from "zod";
 
-const Options = (props: {
-    setOptions: (arg0: { size: number; minHandSize: number }) => void;
-}) => {
+const minBoardSize = 2;
+const maxBoardSize = 9;
+
+
+
+const OptionsSchema = z.object({
+    size: z.number().min(minBoardSize).max(maxBoardSize).int(),
+    minHandSize: z.number().min(1).int(),
+});
+
+
+
+type OptionsType = z.infer<typeof OptionsSchema>;
+
+type OptionsProps = {
+    setOptions: (arg0: OptionsType) => void;
+};
+
+
+
+const Options = (props: OptionsProps) => {
     const [size, setSize] = useState(3);
     const [minHandSize, setMinHandSize] = useState(3);
 
     const submitHandler = (e: { preventDefault: () => void }) => {
         e.preventDefault();
 
-        // TODO: zod validation
-
-        props.setOptions({
-            size: size,
-            minHandSize: minHandSize,
-        });
+        if (!OptionsSchema.safeParse({ size, minHandSize }).success) {
+            alert("Invalid options");
+        } else {
+            props.setOptions({
+                size: size,
+                minHandSize: minHandSize,
+            });
+        }
     };
 
     function changeGrid(value: string) {
@@ -41,8 +62,8 @@ const Options = (props: {
                                 type="range"
                                 name="size"
                                 value={size}
-                                min="2"
-                                max="9"
+                                min={minBoardSize}
+                                max={maxBoardSize}
                                 step={1}
                                 onChange={(e) => changeGrid(e.target.value)}
                             />
