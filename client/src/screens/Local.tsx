@@ -48,7 +48,7 @@ function Local() {
     return (
         <>
             {setup === null || gameOptions === null ? (
-                <Options setOptions={setGameOptions} />
+                <Options setOptions={setGameOptions} mode="local"/>
             ) : (
                 <Game
                     setup={setup}

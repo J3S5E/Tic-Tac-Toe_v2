@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Game from "../components/Game";
+import Options from "../components/Options";
 
 interface Setup {
     player1: string;
@@ -7,9 +8,15 @@ interface Setup {
     startingPlayer: "P1" | "P2";
 }
 
+interface GameOptions {
+    size: number;
+    minHandSize: number;
+    cpuDifficulty?: number;
+}
+
 function Cpu() {
     const [setup, setSetup] = useState<Setup | null>(null);
-    const [difficulty, setDifficulty] = useState("easy");
+    const [gameOptions, setGameOptions] = useState<GameOptions | null>(null);
 
     async function getIfPlayerTurn() {
         // TODO: get if player turn from server
@@ -46,56 +53,7 @@ function Cpu() {
     return (
         <>
             {setup === null ? (
-                <form onSubmit={submitHandler}>
-                    <div className="Menu text-center">
-                        <div className="MenuHeader giant_emoji">🤖</div>
-                        <div className="MenuItems">
-                            <label className="MenuItem radio">
-                                <input
-                                    type="radio"
-                                    name="difficulty"
-                                    value="easy"
-                                    checked={difficulty === "easy"}
-                                    onChange={(e) =>
-                                        setDifficulty(e.target.value)
-                                    }
-                                />
-                                Easy
-                            </label>
-                            <label className="MenuItem radio">
-                                <input
-                                    type="radio"
-                                    name="difficulty"
-                                    value="med"
-                                    checked={difficulty === "med"}
-                                    onChange={(e) =>
-                                        setDifficulty(e.target.value)
-                                    }
-                                />
-                                Medium
-                            </label>
-                            <label className="MenuItem radio">
-                                <input
-                                    type="radio"
-                                    name="difficulty"
-                                    value="hard"
-                                    checked={difficulty === "hard"}
-                                    onChange={(e) =>
-                                        setDifficulty(e.target.value)
-                                    }
-                                />
-                                Hard
-                            </label>
-
-                            <button
-                                type="submit"
-                                className="MenuItem btn-default"
-                            >
-                                Start
-                            </button>
-                        </div>
-                    </div>
-                </form>
+                <Options setOptions={setGameOptions} mode="cpu" />
             ) : (
                 <Game
                     setup={setup}
