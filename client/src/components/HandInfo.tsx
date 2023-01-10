@@ -23,7 +23,7 @@ const HandInfo = (props: HandInfoProps) => {
             >
                 {waiting && currentPlayer === player.color ? `Waiting for ${player.label}` : player.label}
             </div>
-            <div className="player-hand">
+            <div className="player-options big_emoji">
                 {player.hand.map((action, i) => {
                     return (
                         <div
