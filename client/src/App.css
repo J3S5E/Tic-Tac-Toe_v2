@@ -258,10 +258,8 @@ label.MenuItem {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
-  margin: 2%;
   flex-wrap: wrap;
   gap: 2rem;
-  column-gap: 5rem;
 }
 
 .player-name {

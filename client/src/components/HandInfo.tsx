@@ -29,8 +29,8 @@ const HandInfo = (props: HandInfoProps) => {
                         <div
                             className={
                                 selected === i && currentPlayer === player.color
-                                    ? "player-action selected"
-                                    : "player-action"
+                                    ? "player-option selected"
+                                    : "player-option"
                             }
                             key={i}
                             onClick={(e) => currentPlayer === player.color && !waiting ? setSelected(i) : null}
