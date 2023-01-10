@@ -1,60 +1,40 @@
 import React, { useState, useEffect } from "react";
-import Game from "../components/Game";
+import GameInstance from "../components/Game";
 import Options from "../components/Options";
-
-interface GameOptions {
-    size: number;
-    minHandSize: number;
-}
-
-interface Setup {
-    player1: string;
-    player2: string;
-    startingPlayer: "P1" | "P2";
-}
+import { Game, PlayerMove, GameOptions } from "../shared/interfaces/game.interface";
+import SetupGame from "../shared/actions/local/setup";
+import HandleMove from "../shared/actions/local/move";
 
 function Local() {
-    const [setup, setSetup] = useState<Setup | null>(null);
     const [gameOptions, setGameOptions] = useState<GameOptions | null>(null);
+    const [gameState, setGameState] = useState<Game | null>(null);
 
-    async function getIfPlayerTurn() {
-        return true;
+    function init(gameOptions: GameOptions) {
+        setGameState(SetupGame(gameOptions));
     }
 
-    async function getGameState() {
-        return false;
+    function handleMove(move: PlayerMove) {
+        if (gameState === null) {
+            return;
+        }
+        setGameState(HandleMove(gameState, move));
     }
 
-    function init(gameOptions: GameOptions | null) {
-        const start = Math.random() > 0.5 ? "P1" : "P2";
-
-        const p1 = "PLAYER 1";
-        const p2 = "PLAYER 2";
-
-        setSetup({
-            player1: p1,
-            player2: p2,
-            startingPlayer: start,
-        });
-
-        // TODO: make start game state
-        
-    }
 
     useEffect(() => {
-        init(gameOptions);
+        if (gameOptions !== null)
+            init(gameOptions);
     }, [gameOptions]);
 
     return (
         <>
-            {setup === null || gameOptions === null ? (
+            {gameState === null || gameOptions === null ? (
                 <Options setOptions={setGameOptions} mode="local"/>
             ) : (
-                <Game
-                    setup={setup}
-                    playerTurn={getIfPlayerTurn}
-                    gameState={getGameState}
-                    options={gameOptions}
+                <GameInstance
+                    gameState={gameState}
+                    handleMove={handleMove}
+                    waiting={false}
                 />
             )}
         </>
