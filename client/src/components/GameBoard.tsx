@@ -16,7 +16,7 @@ const GameBoardView = (props: {
                             return (
                                 <div
                                     className={
-                                        "board-cell " +
+                                        "board-cell big_emoji " +
                                         cell.color +
                                         " size" +
                                         zoom
