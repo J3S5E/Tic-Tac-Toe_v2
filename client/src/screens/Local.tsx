@@ -13,11 +13,16 @@ function Local() {
         setGameState(SetupGame(gameOptions));
     }
 
-    function handleMove(move: PlayerMove) {
+    async function handleMove(move: PlayerMove) {
         if (gameState === null) {
             return;
         }
         setGameState(HandleMove(gameState, move));
+    }
+
+    function reset() {
+        setGameOptions(null);
+        setGameState(null);
     }
 
 
@@ -35,6 +40,7 @@ function Local() {
                     gameState={gameState}
                     handleMove={handleMove}
                     waiting={false}
+                    reset={reset}
                 />
             )}
         </>

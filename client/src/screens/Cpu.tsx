@@ -30,6 +30,11 @@ function Cpu() {
             init(gameOptions);
     }, [gameOptions]);
 
+    function reset() {
+        setGameOptions(null);
+        setGameState(null);
+    }
+
     return (
         <>
             {gameState === null || gameOptions === null ? (
@@ -39,6 +44,7 @@ function Cpu() {
                     gameState={gameState}
                     handleMove={handleMove}
                     waiting={false}
+                    reset={reset}
                 />
             )}
         </>

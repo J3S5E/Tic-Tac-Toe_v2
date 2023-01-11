@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Game, PlayerMove } from "../shared/interfaces/game.interface";
 import ZoomButtons from "./ZoomButtons";
 import isGameOver from "../shared/actions/GameOver";
@@ -9,8 +9,9 @@ const GameInstance = (props: {
     gameState: Game;
     handleMove: (move: PlayerMove) => void;
     waiting: boolean;
+    reset: () => void;
 }) => {
-    const { gameState, handleMove, waiting } = props;
+    const { gameState, handleMove, waiting, reset } = props;
 
     const { board, player1, player2, currentPlayer } = gameState;
 
@@ -45,8 +46,11 @@ const GameInstance = (props: {
         };
 
         handleMove(move);
-        setSelected(null);
     }
+
+    useEffect(() => {
+        setSelected(null);
+    }, [currentPlayer, board]);
 
     return (
         <div className="game-page">
@@ -64,6 +68,9 @@ const GameInstance = (props: {
                     <div className="game-over">
                         <h1>Game Over</h1>
                         <h2>{getWinnerLabel()} wins!</h2>
+                        <button className="back-button" onClick={reset}>
+                            Go Back
+                        </button>
                     </div>
                 ) : (
                     <div className="game-info">
