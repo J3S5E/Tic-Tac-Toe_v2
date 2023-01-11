@@ -4,6 +4,7 @@ import ZoomButtons from "./ZoomButtons";
 import isGameOver from "../shared/actions/GameOver";
 import GameBoardView from "./GameBoard";
 import HandInfo from "./HandInfo";
+import useLocalStorage from "../shared/hooks/useLocalStorage";
 
 const GameInstance = (props: {
     gameState: Game;
@@ -16,7 +17,7 @@ const GameInstance = (props: {
     const { board, player1, player2, currentPlayer } = gameState;
 
     const [selected, setSelected] = useState<number | null>(null);
-    const [zoom, setZoom] = useState<number>(5);
+    const [zoom, setZoom] = useLocalStorage<number>("zoom",5);
 
     const { gameOver, winner } = isGameOver(gameState);
 

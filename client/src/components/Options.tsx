@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
+import useLocalStorage from "../shared/hooks/useLocalStorage";
 import DifficultySelect from "./forms/DifficultySelect";
 import HandSizeSelect from "./forms/HandSizeSelect";
 import NameEnter from "./forms/NameEnter";
@@ -24,10 +25,10 @@ type OptionsProps = {
 };
 
 const Options = (props: OptionsProps) => {
-    const [size, setSize] = useState(3);
-    const [minHandSize, setMinHandSize] = useState(3);
-    const [cpuDifficulty, setCpuDifficulty] = useState(1);
-    const [playerName, setPlayerName] = useState("");
+    const [size, setSize] = useLocalStorage("board-size", 3);
+    const [minHandSize, setMinHandSize] = useLocalStorage("hand-size", 3);
+    const [cpuDifficulty, setCpuDifficulty] = useLocalStorage("difficulty", 1);
+    const [playerName, setPlayerName] = useLocalStorage("player-name", "");
 
     const submitHandler = (e: { preventDefault: () => void }) => {
         e.preventDefault();
