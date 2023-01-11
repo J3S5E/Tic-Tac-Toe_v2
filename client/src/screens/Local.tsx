@@ -3,7 +3,7 @@ import GameInstance from "../components/Game";
 import Options from "../components/Options";
 import { Game, PlayerMove, GameOptions } from "../shared/interfaces/game.interface";
 import SetupGame from "../shared/actions/local/setup";
-import HandleMove from "../shared/actions/local/move";
+import { HandleMove } from "../shared/actions/local/move";
 
 function Local() {
     const [gameOptions, setGameOptions] = useState<GameOptions | null>(null);

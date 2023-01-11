@@ -113,4 +113,4 @@ function getRandomPiece(): GamePiece {
     return pieces[index];
 }
 
-export default HandleMove;
+export { HandleMove , isValidMove };
