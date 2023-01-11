@@ -35,6 +35,8 @@ interface PlayerMove {
 interface GameOptions {
     size: number;
     minHandSize: number;
+    playerName?: string;
+    cpuDifficulty?: number;
 }
 
 export { Game, BoardSpace, GameBoard, Player, PlayerMove, GameOptions, GamePiece, GameColor };
