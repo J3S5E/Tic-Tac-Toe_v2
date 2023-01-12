@@ -85,7 +85,7 @@ const Options = (props: OptionsProps) => {
     return (
         <form onSubmit={submitHandler}>
             <div className="Options text-center">
-                {waiting == true ? (
+                {waiting === true ? (
                     <div className="OptionsHeader giant_emoji spinner">{getIcon()}</div>
                 ) : (
                     <div className="OptionsHeader giant_emoji">{getIcon()}</div>
