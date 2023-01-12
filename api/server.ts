@@ -10,6 +10,7 @@ if (!databaseUrl) {
 
 import { GameOptions, PlayerMove } from "./game.interface";
 import { ProcessMoveCpu, SetupCpuGame } from "./cpu-logic.js";
+import { AddPlayerToQueue, ProcessPlayerMove } from "./online-logic.js";
 
 const PORT = 4242;
 
@@ -41,13 +42,11 @@ io.on("connection", (socket) => {
     console.log(`New connection`, clientId);
 
     socket.on("online-game:start", (gameOptions: GameOptions) => {
-        // TODO
-        console.log(gameOptions);
+        AddPlayerToQueue(gameOptions, clientId, socketId);
     });
 
     socket.on("online-game:move", (move: PlayerMove) => {
-        // TODO
-        console.log(move);
+        ProcessPlayerMove(move, clientId, socketId);
     });
 
     socket.on("cpu-game:start", (gameOptions: GameOptions) => {
