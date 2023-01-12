@@ -1,9 +1,22 @@
-import { GameOptions, Game, GameUpdate, PlayerMove, GamePiece, GameBoard, GameColor } from "./game.interface";
+import {
+    GameOptions,
+    Game,
+    GameUpdate,
+    PlayerMove,
+    GamePiece,
+    GameBoard,
+    GameColor,
+} from "./game.interface";
 
 import CpuGame from "./models/cpu-game.js";
 
 import io from "./server.js";
-import { checkGameOver, isMoveValid, makeGame, makeMove } from "./game-logic.js";
+import {
+    checkGameOver,
+    isMoveValid,
+    makeGame,
+    makeMove,
+} from "./game-logic.js";
 
 async function SetupCpuGame(
     gameOptions: GameOptions,
@@ -109,12 +122,19 @@ function getCpuMove(gameState: Game, cpuDifficulty: number): PlayerMove {
     // Try to win
     const winningMove = canWin(gameState, "red");
     if (winningMove.result && winningMove.move !== null) {
-        return winningMove.move;
+        if (isMoveValid(gameState, winningMove.move)) {
+            return winningMove.move;
+        }
     }
     // Try to block win
     const playerWinningMove = canWin(gameState, "blue");
     if (playerWinningMove.result && playerWinningMove.move !== null) {
-        // return blockStrategy(gameState, playerWinningMove.move);
+        const blockingMove = blockStrategy(gameState, playerWinningMove.move, cpuDifficulty);
+        if (blockingMove !== null) {
+            if (isMoveValid(gameState, blockingMove)) {
+                return blockingMove;
+            }
+        }
     }
 
     // Make move based on difficulty
@@ -144,7 +164,7 @@ function easyCpuMove(gameState: Game): PlayerMove {
 }
 
 function makeRandomMove(gameState: Game): PlayerMove {
-    let playerMove = getRandomMove(gameState)
+    let playerMove = getRandomMove(gameState);
     while (!isMoveValid(gameState, playerMove)) {
         playerMove = getRandomMove(gameState);
     }
@@ -157,7 +177,7 @@ function getRandomMove(gameState: Game): PlayerMove {
     const col = Math.floor(Math.random() * size);
     const action = getRandomPiece();
     const index = gameState.player2.hand.indexOf(action);
-    const move: PlayerMove = { player: "red", row, col, action, index};
+    const move: PlayerMove = { player: "red", row, col, action, index };
     return move;
 }
 
@@ -167,9 +187,12 @@ function getRandomPiece(): GamePiece {
     return pieces[index];
 }
 
-
-function canWin(gameState: Game, color: GameColor): { result: boolean; move: PlayerMove|null } {
-    const currentHand = color === "blue" ? gameState.player1.hand : gameState.player2.hand;
+function canWin(
+    gameState: Game,
+    color: GameColor
+): { result: boolean; move: PlayerMove | null } {
+    const currentHand =
+        color === "blue" ? gameState.player1.hand : gameState.player2.hand;
     const options = [...new Set(currentHand)];
     for (let i = 0; i < gameState.board.length; i++) {
         for (let j = 0; j < gameState.board.length; j++) {
@@ -196,7 +219,7 @@ function doesMoveWin(board: GameBoard, move: PlayerMove): boolean {
     const { row, col } = move;
     const color = move.player;
     const size = board.length;
-    
+
     // Check row
     let rowWin = true;
     for (let i = 0; i < size; i++) {
@@ -243,6 +266,89 @@ function doesMoveWin(board: GameBoard, move: PlayerMove): boolean {
             return true;
         }
     }
-    
+
     return false;
+}
+
+function blockStrategy(
+    gameState: Game,
+    winningMove: PlayerMove,
+    cpuDifficulty: number
+): PlayerMove | null {
+    const { row, col } = winningMove;
+    const currentValue = gameState.board[row][col].value;
+    const winnerHand =
+        winningMove.player === "blue"
+            ? gameState.player1.hand
+            : gameState.player2.hand;
+    const blockerHand =
+        winningMove.player === "blue"
+            ? gameState.player2.hand
+            : gameState.player1.hand;
+
+    if (currentValue !== null) {
+        let action: GamePiece = "📰";
+        switch (currentValue) {
+            case "🗻":
+                action = "📰";
+                break;
+            case "📰":
+                action = "✂";
+                break;
+            case "✂":
+                action = "🗻";
+                break;
+            default:
+                return null;
+        }
+        const move: PlayerMove = {
+            row,
+            col,
+            action: action,
+            index: blockerHand.indexOf(action),
+            player: "red",
+        };
+        return move;
+    } else {
+        // remove duplicate pieces from hand
+        const options = [...new Set(winnerHand)];
+
+        // see if the winner does not have options
+        if (options.length < 3) {
+            let action: GamePiece | null = null;
+            if (!("🗻" in options)) {
+                if (blockerHand.indexOf("✂") !== -1) action = "✂";
+            }
+            if (!("📰" in options)) {
+                if (blockerHand.indexOf("🗻") !== -1) action = "🗻";
+            }
+            if (!("✂" in options)) {
+                if (blockerHand.indexOf("📰") !== -1) action = "📰";
+            }
+            if (action === null) {
+                return null;
+            }
+            const move: PlayerMove = {
+                row,
+                col,
+                action: action,
+                index: blockerHand.indexOf(action),
+                player: "red",
+            };
+            return move;
+        } else {
+            if (cpuDifficulty !== 1) {
+                return null;
+            } else {
+                const move: PlayerMove = {
+                    row,
+                    col,
+                    action: blockerHand[0],
+                    index: 0,
+                    player: "red",
+                };
+                return move;
+            }
+        }
+    }
 }

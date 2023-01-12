@@ -80,11 +80,6 @@ function makeGame(player1Label: string, player2Label: string, gameOptions: GameO
 
 
 function isMoveValid(state: Game, move: PlayerMove): boolean {
-    // check if players turn
-    if (state.currentPlayer !== move.player) {
-        return false;
-    }
-
     // check if space exists
     if (move.row < 0 || move.row >= state.size) {
         return false;
