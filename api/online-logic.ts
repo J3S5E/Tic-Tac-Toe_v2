@@ -119,6 +119,9 @@ async function AddPlayerToQueue(
     const alreadyInQueue = await InQueue.findOne({ clientId: clientId });
     if (alreadyInQueue) {
         alreadyInQueue.socketId = socketId;
+        alreadyInQueue.minHandSize = gameOptions.minHandSize;
+        alreadyInQueue.size = gameOptions.size;
+        alreadyInQueue.name = gameOptions.playerName || "Player " + socketId;
         await alreadyInQueue.save();
         return;
     }
@@ -181,5 +184,27 @@ schedule("*/10 * * * * *", async function () {
         }
     }
 
+});
+
+
+schedule("*/30 * * * * *", async function () {
+
+    // get all current games
+    const ongoingGames = await OnlineGame.find({ gameOver: false });
+
+    // find games that have been inactive for 120 seconds
+    const inactiveGames = ongoingGames.filter((game) => {
+        const lastMoveTime = new Date(game.updatedAt).getTime();
+        const currentTime = new Date().getTime();
+        return currentTime - lastMoveTime > 120000;
+    });
+
+    // end the games
+    for (const game of inactiveGames) {
+        game.gameOver = true;
+        const winner = game.gameState.currentPlayer === "red" ? game.gameState.player2.label : game.gameState.player1.label;
+        game.winner = winner;
+        await game.save();
+    }
 
 });
