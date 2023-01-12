@@ -40,7 +40,8 @@ function Online() {
             return;
         }
         // change currentPlayer
-        gameState.currentPlayer = gameState.currentPlayer === "red" ? "blue" : "red";
+        gameState.currentPlayer =
+            gameState.currentPlayer === "red" ? "blue" : "red";
 
         // update board
         gameState.board[move.row][move.col].color = move.player;
@@ -72,19 +73,26 @@ function Online() {
     }
 
     useEffect(() => {
-        if (gameOptions !== null && socket !== null)
+        if (gameOptions !== null && socket !== null) {
             socket?.emit("online-game:start", gameOptions);
+            setWaiting(true);
+        }
     }, [gameOptions, socket]);
 
     function reset() {
         setGameOptions(null);
         setGameState(null);
+        setWaiting(false);
     }
 
     return (
         <>
             {gameState === null || gameOptions === null ? (
-                <Options setOptions={setGameOptions} mode="online" />
+                <Options
+                    setOptions={setGameOptions}
+                    mode="online"
+                    waiting={waiting}
+                />
             ) : (
                 <GameInstance
                     gameState={gameState}

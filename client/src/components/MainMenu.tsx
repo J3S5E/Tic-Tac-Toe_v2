@@ -23,8 +23,8 @@ const MainMenu = () => {
                             Play Against a Computer
                         </button>
                     </Link>
-                    <Link to="/find">
-                        <button className="MenuItem btn-danger" disabled={true}>
+                    <Link to="/online">
+                        <button className="MenuItem btn-danger">
                             Play Against a Person Online
                         </button>
                     </Link>

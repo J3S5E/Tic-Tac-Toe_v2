@@ -22,6 +22,7 @@ type OptionsType = z.infer<typeof OptionsSchema>;
 type OptionsProps = {
     setOptions: (arg0: OptionsType) => void;
     mode: "cpu" | "local" | "online";
+    waiting?: boolean;
 };
 
 const Options = (props: OptionsProps) => {
@@ -30,12 +31,14 @@ const Options = (props: OptionsProps) => {
     const [cpuDifficulty, setCpuDifficulty] = useLocalStorage("difficulty", 1);
     const [playerName, setPlayerName] = useLocalStorage("player-name", "");
 
+    const waiting = props.waiting ?? false;
+
     const submitHandler = (e: { preventDefault: () => void }) => {
         e.preventDefault();
 
         let options: OptionsType = {
             size,
-            minHandSize
+            minHandSize,
         };
 
         switch (props.mode) {
@@ -82,7 +85,11 @@ const Options = (props: OptionsProps) => {
     return (
         <form onSubmit={submitHandler}>
             <div className="Options text-center">
-                <div className="OptionsHeader giant_emoji">{getIcon()}</div>
+                {waiting == true ? (
+                    <div className="OptionsHeader giant_emoji spinner">{getIcon()}</div>
+                ) : (
+                    <div className="OptionsHeader giant_emoji">{getIcon()}</div>
+                )}
                 {props.mode === "online" && (
                     <NameEnter
                         setPlayerName={setPlayerName}
