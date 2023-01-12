@@ -19,7 +19,7 @@ const MainMenu = () => {
                         </button>
                     </Link>
                     <Link to="/cpu">
-                        <button className="MenuItem btn-default" disabled={true}>
+                        <button className="MenuItem btn-default">
                             Play Against a Computer
                         </button>
                     </Link>
