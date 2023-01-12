@@ -8,18 +8,16 @@ const SizeSelect = (props: {
 }) => {
     return (
         <div className="OptionsItems">
-            <label className="OptionsItem label">Board Size</label>
-            <label className="OptionsItem slider">
-                <input
-                    type="range"
-                    name="size"
-                    value={props.size}
-                    min={props.minBoardSize}
-                    max={props.maxBoardSize}
-                    step={1}
-                    onChange={(e) => props.changeGrid(e.target.value)}
-                />
-            </label>
+            <label className="OptionsItem label">Grid Board Size</label>
+            <input
+                type="range"
+                name="size"
+                value={props.size}
+                min={props.minBoardSize}
+                max={props.maxBoardSize}
+                step={1}
+                onChange={(e) => props.changeGrid(e.target.value)}
+            />
             <label className="OptionsItem value">{`${props.size} x ${props.size} grid`}</label>
         </div>
     );

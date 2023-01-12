@@ -8,17 +8,15 @@ const HandSizeSelect = (props: {
     return (
         <div className="OptionsItems">
             <label className="OptionsItem label">Minimum Hand Size</label>
-            <label className="OptionsItem Number">
-                <input
-                    type="range"
-                    name="minHandSize"
-                    value={props.minHandSize}
-                    min="1"
-                    max={props.size * 2}
-                    step={1}
-                    onChange={(e) => props.changeHandSize(e.target.value)}
-                />
-            </label>
+            <input
+                type="range"
+                name="minHandSize"
+                value={props.minHandSize}
+                min="1"
+                max={props.size * 2}
+                step={1}
+                onChange={(e) => props.changeHandSize(e.target.value)}
+            />
             <label className="OptionsItem value">{`${props.minHandSize} cards`}</label>
         </div>
     );

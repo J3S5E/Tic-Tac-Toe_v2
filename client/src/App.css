@@ -76,10 +76,12 @@ body {
 /* options menu */
 
 .OptionsGrid {
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr;
-  grid-gap: 1rem;
+  display:flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  align-content: flex-end;
+  flex-wrap: wrap;
 }
 
 .OptionsList {
@@ -90,10 +92,23 @@ body {
   margin: 2rem;
 }
 
+.OptionsItems {
+  max-width: 75vw;
+  display:flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 2rem;
+}
+
+.slider {
+  max-width: 100% !important;
+  margin: 1rem;
+}
+
 .OptionsItem {
   text-align: center;
   height: auto;
-  width: 80%;
   font-size: 2rem;
   margin: 1%;
   max-width: 750px;
@@ -131,6 +146,7 @@ label.MenuItem {
 .playerName {
   font-size: 3rem;
   text-align: center;
+  max-width: 75vw;
 }
 
 
