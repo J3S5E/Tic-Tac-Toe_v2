@@ -1,3 +1,5 @@
+import { schedule } from "node-cron";
+
 import {
     GameOptions,
     Game,
@@ -63,6 +65,8 @@ async function ProcessPlayerMove(
         return;
     }
 
+    storedGame.gameState = gameState;
+
     // Update game state in database
     await storedGame.save();
 
@@ -101,6 +105,12 @@ async function AddPlayerToQueue(
             gameState: storedGame.gameState,
             isPlayerTurn: playerColor === storedGame.gameState.currentPlayer,
         };
+        if (storedGame.player1Id === clientId) {
+            storedGame.player1SocketId = socketId;
+        } else {
+            storedGame.player2SocketId = socketId;
+        }
+        await storedGame.save();
         io.to(socketId).emit("online-game:update", playerGameUpdate);
         return;
     }
@@ -127,5 +137,49 @@ async function AddPlayerToQueue(
 export { ProcessPlayerMove, AddPlayerToQueue };
 
 
+schedule("*/10 * * * * *", async function () {
+    const playersInQueue = await InQueue.find({}).sort({ updatedAt: 1 });
 
-// TODO: run scheduled job to check for players in queue and create games
+    if (playersInQueue.length < 2) {
+        return;
+    }
+
+    for(let i = 0; i < playersInQueue.length; i++) {
+        const player1 = playersInQueue[i];
+        
+        for(let j = i + 1; j < playersInQueue.length; j++) {
+            const player2 = playersInQueue[j];
+            
+            if (player1.size === player2.size && player1.minHandSize === player2.minHandSize) {
+                const gameOptions: GameOptions = {
+                    size: player1.size,
+                    minHandSize: player1.minHandSize
+                };
+                const game = makeGame(player2.name, player1.name, gameOptions);
+                const onlineGame = new OnlineGame({
+                    player1Id: player1.clientId,
+                    player1SocketId: player1.socketId,
+                    player2Id: player2.clientId,
+                    player2SocketId: player2.socketId,
+                    gameState: game,
+                    gameOver: false,
+                });
+                await onlineGame.save();
+                const player1GameUpdate: GameUpdate = {
+                    gameState: game,
+                    isPlayerTurn: "red" === game.currentPlayer
+                };
+                const player2GameUpdate: GameUpdate = {
+                    gameState: game,
+                    isPlayerTurn: "blue" === game.currentPlayer
+                };
+                io.to(player1.socketId).emit("online-game:update", player1GameUpdate);
+                io.to(player2.socketId).emit("online-game:update", player2GameUpdate);
+                await InQueue.deleteMany({ clientId: { $in: [player1.clientId, player2.clientId] } });
+                return;
+            }
+        }
+    }
+
+
+});
