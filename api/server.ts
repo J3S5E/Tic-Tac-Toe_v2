@@ -1,11 +1,29 @@
 import { Server } from "socket.io";
+import mongoose from "mongoose";
 import dotenv from "dotenv";
 dotenv.config()
+
+const databaseUrl = process.env.NODE_ENV === 'production' ? process.env.DATABASE_URL : process.env.DATABASE_DEV_URL;
+if (!databaseUrl) {
+    throw new Error("No database url");
+}
 
 import { GameOptions, PlayerMove } from "./game.interface";
 import { ProcessMoveCpu, SetupCpuGame } from "./cpu-logic.js";
 
 const PORT = 4242;
+
+mongoose.set('strictQuery', false);
+
+// connect to mongodb
+mongoose.connect(databaseUrl)
+    .then(() => {
+        console.log('Connected to MongoDB');
+    })
+    .catch((err: Error) => {
+        console.log('Error connecting to MongoDB: ', err.message);
+        process.exit();
+    });
 
 
 // set up socket.io

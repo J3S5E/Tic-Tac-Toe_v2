@@ -1,54 +1,248 @@
-import { GameOptions, Player, GameBoard, Game } from "./game.interface";
+import { GameOptions, Game, GameUpdate, PlayerMove, GamePiece, GameBoard, GameColor } from "./game.interface";
+
+import CpuGame from "./models/cpu-game.js";
 
 import io from "./server.js";
-import {randomStartingHand, createBoard} from "./game-logic.js";
+import { checkGameOver, isMoveValid, makeGame, makeMove } from "./game-logic.js";
 
+async function SetupCpuGame(
+    gameOptions: GameOptions,
+    clientId: string,
+    socketId: string
+) {
+    // Check if there is an ongoing game and end them
+    const gamesOngoing = await CpuGame.find({ clientId, gameOver: false });
+    for (const gameOngoing of gamesOngoing) {
+        gameOngoing.gameOver = true;
+        gameOngoing.winner = "CPU";
+        await gameOngoing.save();
+    }
 
+    // Create new game
+    const { cpuDifficulty } = gameOptions;
+    const initGameState = makeGame("Player", "CPU", gameOptions);
 
-function SetupCpuGame(gameOptions: GameOptions, clientId: string, socketId: string) {
+    // Make CPU move if cpu starts
+    const gameState =
+        initGameState.currentPlayer === "red"
+            ? makeCpuMove(initGameState, cpuDifficulty || 1)
+            : initGameState;
 
-    const { size, minHandSize, cpuDifficulty } = gameOptions;
-    const handSize = minHandSize > size * 2 ? minHandSize : size * 2;
-
-    const player1: Player = {
-        hand: randomStartingHand(handSize),
-        color: "blue",
-        label: "Player",
-    };
-
-    const player2: Player = {
-        hand: randomStartingHand(handSize),
-        color: "red",
-        label: "CPU",
-    };
-
-    const currentPlayer = Math.random() > 0.5 ? "red" : "blue";
-    const playerTurn = currentPlayer === "blue" ? true : false;
-
-    const board: GameBoard = createBoard(size);
-
-    const game: Game = {
-        board,
-        player1,
-        player2,
-        currentPlayer,
-        size,
-        minHandSize,
-    };
-
-    io.to(socketId).emit("cpu-game:update", {
-        game,
-        playerTurn
+    // Save game state to database
+    const storedGame = new CpuGame({
+        clientId,
+        gameState,
+        cpuDifficulty,
     });
+    storedGame.save();
+
+    // Send game state to client
+    const gameUpdate: GameUpdate = {
+        gameState,
+        isPlayerTurn: true,
+    };
+    io.to(socketId).emit("cpu-game:update", gameUpdate);
 }
 
-function ProcessMoveCpu(move: any, clientId: string, socketId: string) {
-    // TODO: Is move valid?
-        // TODO: Make player move
+async function ProcessMoveCpu(move: any, clientId: string, socketId: string) {
+    // check that is a player move
+    if (move.player !== "blue") {
+        return;
+    }
 
-    // TODO: Make CPU move
+    // Get game info from database
+    const storedGame = await CpuGame.findOne({ clientId, gameOver: false });
+    if (!storedGame) {
+        return;
+    }
 
-    // TODO: send updated game state to client
+    if (isMoveValid(storedGame.gameState, move)) {
+        storedGame.gameState = makeMove(storedGame.gameState, move);
+        storedGame.gameOver = checkGameOver(storedGame.gameState);
+        if (storedGame.gameOver) {
+            storedGame.winner = "Player";
+        }
+    } else {
+        const gameUpdate: GameUpdate = {
+            gameState: storedGame.gameState,
+            isPlayerTurn: true,
+        };
+        io.to(socketId).emit("cpu-game:update", gameUpdate);
+        return;
+    }
+
+    if (!storedGame.gameOver) {
+        // make cpu move
+        storedGame.gameState = makeCpuMove(
+            storedGame.gameState,
+            storedGame.cpuDifficulty
+        );
+        storedGame.gameOver = checkGameOver(storedGame.gameState);
+        if (storedGame.gameOver) {
+            storedGame.winner = "CPU";
+        }
+    }
+
+    // Update game state in database
+    await storedGame.save();
+
+    // Send game state to client
+    const gameUpdate: GameUpdate = {
+        gameState: storedGame.gameState,
+        isPlayerTurn: true,
+    };
+    io.to(socketId).emit("cpu-game:update", gameUpdate);
 }
 
 export { SetupCpuGame, ProcessMoveCpu };
+
+///// Local Functions
+
+function makeCpuMove(gameState: Game, cpuDifficulty: number): Game {
+    makeMove(gameState, getCpuMove(gameState, cpuDifficulty));
+    // change to player turn
+    gameState.currentPlayer = "blue";
+    return gameState;
+}
+
+function getCpuMove(gameState: Game, cpuDifficulty: number): PlayerMove {
+    // Try to win
+    const winningMove = canWin(gameState, "red");
+    if (winningMove.result && winningMove.move !== null) {
+        return winningMove.move;
+    }
+    // Try to block win
+    const playerWinningMove = canWin(gameState, "blue");
+    if (playerWinningMove.result && playerWinningMove.move !== null) {
+        // return blockStrategy(gameState, playerWinningMove.move);
+    }
+
+    // Make move based on difficulty
+    if (cpuDifficulty === 3) {
+        return hardCpuMove(gameState);
+    } else if (cpuDifficulty === 2) {
+        return mediumCpuMove(gameState);
+    } else {
+        return easyCpuMove(gameState);
+    }
+}
+
+function hardCpuMove(gameState: Game): PlayerMove {
+    // See who has longest line
+    // make strategic move
+    return mediumCpuMove(gameState);
+}
+
+function mediumCpuMove(gameState: Game): PlayerMove {
+    // extend a current line
+    // make random move
+    return easyCpuMove(gameState);
+}
+
+function easyCpuMove(gameState: Game): PlayerMove {
+    return makeRandomMove(gameState);
+}
+
+function makeRandomMove(gameState: Game): PlayerMove {
+    let playerMove = getRandomMove(gameState)
+    while (!isMoveValid(gameState, playerMove)) {
+        playerMove = getRandomMove(gameState);
+    }
+    return playerMove;
+}
+
+function getRandomMove(gameState: Game): PlayerMove {
+    const size = gameState.board.length;
+    const row = Math.floor(Math.random() * size);
+    const col = Math.floor(Math.random() * size);
+    const action = getRandomPiece();
+    const index = gameState.player2.hand.indexOf(action);
+    const move: PlayerMove = { player: "red", row, col, action, index};
+    return move;
+}
+
+function getRandomPiece(): GamePiece {
+    const pieces: GamePiece[] = ["🗻", "📰", "✂"];
+    const index = Math.floor(Math.random() * pieces.length);
+    return pieces[index];
+}
+
+
+function canWin(gameState: Game, color: GameColor): { result: boolean; move: PlayerMove|null } {
+    const currentHand = color === "blue" ? gameState.player1.hand : gameState.player2.hand;
+    const options = [...new Set(currentHand)];
+    for (let i = 0; i < gameState.board.length; i++) {
+        for (let j = 0; j < gameState.board.length; j++) {
+            for (const option of options) {
+                const move: PlayerMove = {
+                    player: color,
+                    row: i,
+                    col: j,
+                    action: option,
+                    index: currentHand.indexOf(option),
+                };
+                if (isMoveValid(gameState, move)) {
+                    if (doesMoveWin(gameState.board, move)) {
+                        return { result: true, move };
+                    }
+                }
+            }
+        }
+    }
+    return { result: false, move: null };
+}
+
+function doesMoveWin(board: GameBoard, move: PlayerMove): boolean {
+    const { row, col } = move;
+    const color = move.player;
+    const size = board.length;
+    
+    // Check row
+    let rowWin = true;
+    for (let i = 0; i < size; i++) {
+        if (i === col) {
+            continue;
+        }
+        if (board[row][i].color !== color) {
+            rowWin = false;
+            break;
+        }
+    }
+    if (rowWin) {
+        return true;
+    }
+
+    // Check column
+    let colWin = true;
+    for (let i = 0; i < size; i++) {
+        if (i === row) {
+            continue;
+        }
+        if (board[i][col].color !== color) {
+            colWin = false;
+            break;
+        }
+    }
+    if (colWin) {
+        return true;
+    }
+
+    // Check diagonal
+    if (row === col) {
+        let diagWin = true;
+        for (let i = 0; i < size; i++) {
+            if (i === row) {
+                continue;
+            }
+            if (board[i][i].color !== color) {
+                diagWin = false;
+                break;
+            }
+        }
+        if (diagWin) {
+            return true;
+        }
+    }
+    
+    return false;
+}

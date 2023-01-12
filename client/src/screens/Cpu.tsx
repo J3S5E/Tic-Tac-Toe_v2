@@ -5,6 +5,7 @@ import {
     Game,
     PlayerMove,
     GameOptions,
+    GameUpdate,
 } from "../shared/interfaces/game.interface";
 import { useSocket } from "../shared/contexts/SocketProvider";
 import { isValidMove } from "../shared/actions/local/move";
@@ -20,10 +21,10 @@ function Cpu() {
         if (socket === null) {
             return;
         }
-        socket.on("cpu-game:update", (update) => {
-            const { game, playerTurn } = update;
-            setGameState(game);
-            if (playerTurn) {
+        socket.on("cpu-game:update", (update: GameUpdate) => {
+            const { gameState, isPlayerTurn } = update;
+            setGameState(gameState);
+            if (isPlayerTurn) {
                 setWaiting(false);
             } else {
                 setWaiting(true);

@@ -39,4 +39,9 @@ interface GameOptions {
     cpuDifficulty?: number;
 }
 
-export { Game, BoardSpace, GameBoard, Player, PlayerMove, GameOptions, GamePiece, GameColor };
+interface GameUpdate {
+    gameState: Game;
+    isPlayerTurn: boolean;
+}
+
+export { Game, BoardSpace, GameBoard, Player, PlayerMove, GameOptions, GamePiece, GameColor, GameUpdate };
