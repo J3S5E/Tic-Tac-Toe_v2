@@ -126,6 +126,17 @@ label.MenuItem {
 }
 
 
+/* Online select */
+
+.playerName {
+  font-size: 3rem;
+  text-align: center;
+}
+
+
+
+
+
 /* GAME */
 
 .game-colors {

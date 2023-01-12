@@ -11,6 +11,7 @@ const NameEnter = (props: {
                 <input
                     type="text"
                     name="playerName"
+                    className="playerName"
                     value={props.playerName}
                     onChange={(e) => props.setPlayerName(e.target.value)}
                 />

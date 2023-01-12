@@ -8,6 +8,7 @@ import Cpu from "./screens/Cpu";
 import Local from "./screens/Local";
 import useLocalStorage from "./shared/hooks/useLocalStorage";
 import { SocketProvider } from "./shared/contexts/SocketProvider";
+import Online from "./screens/Online";
 
 function genRandomId() {
     return (
@@ -29,6 +30,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<HomeScreen />} />
                     <Route path="/cpu" element={<Cpu />} />
+                    <Route path="/online" element={<Online />} />
                     <Route path="/local" element={<Local />} />
                 </Routes>
             </Router>
