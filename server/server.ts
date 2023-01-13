@@ -12,7 +12,7 @@ import { GameOptions, PlayerMove } from "./game.interface";
 import { ProcessMoveCpu, SetupCpuGame } from "./cpu-logic.js";
 import { AddPlayerToQueue, ProcessPlayerMove } from "./online-logic.js";
 
-const PORT = 4242;
+const PORT = Number(process.env.SOCKET_PORT || "4242");
 
 mongoose.set('strictQuery', false);
 
@@ -30,7 +30,7 @@ mongoose.connect(databaseUrl)
 // set up socket.io
 const io = new Server(PORT, {
     cors: {
-        origin: process.env.WEB_HOST || "http://localhost:3000",
+        origin: "*",
         methods: ["GET", "POST"]
     }
 });

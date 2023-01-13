@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  client:
+    build:
+      dockerfile: Dockerfile
+      context: ./client
+    image: "j3s5e/ttt-client:latest"
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+
+  server:
+    build:
+      dockerfile: Dockerfile
+      context: "./server"
+    image: "j3s5e/ttt-server:latest"
+    volumes:
+      - /app/node_modules
+      - ./server:/app
+    ports:
+      - "4243:4242"
+    environment:
+      - NODE_ENV=production
+
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx-conf.d:/etc/nginx/nginx.conf
+    ports:
+      - "81:80"
+    depends_on:
+      - client
+      - server
