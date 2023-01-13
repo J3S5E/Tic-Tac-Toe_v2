@@ -207,7 +207,7 @@ label.MenuItem {
   height: 6vh;
 }
 
-.zoom-out {
+.home-button, .zoom-out {
   position: absolute;
   top: 0;
   left: 0;

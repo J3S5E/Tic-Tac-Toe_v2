@@ -7,6 +7,8 @@ import HandSizeSelect from "./forms/HandSizeSelect";
 import NameEnter from "./forms/NameEnter";
 import SizeSelect from "./forms/SizeSelect";
 
+import { useNavigate } from "react-router-dom";
+
 const minBoardSize = 2;
 const maxBoardSize = 9;
 
@@ -32,6 +34,8 @@ const Options = (props: OptionsProps) => {
     const [playerName, setPlayerName] = useLocalStorage("player-name", "");
 
     const waiting = props.waiting ?? false;
+
+    const navigate = useNavigate();
 
     const submitHandler = (e: { preventDefault: () => void }) => {
         e.preventDefault();
@@ -83,43 +87,59 @@ const Options = (props: OptionsProps) => {
     }
 
     return (
-        <form onSubmit={submitHandler}>
-            <div className="Options text-center">
-                {waiting === true ? (
-                    <div className="OptionsHeader giant_emoji spinner">{getIcon()}</div>
-                ) : (
-                    <div className="OptionsHeader giant_emoji">{getIcon()}</div>
-                )}
-                {props.mode === "online" && (
-                    <NameEnter
-                        setPlayerName={setPlayerName}
-                        playerName={playerName}
-                    />
-                )}
-                <div className="OptionsGrid">
-                    <SizeSelect
-                        size={size}
-                        minBoardSize={minBoardSize}
-                        maxBoardSize={maxBoardSize}
-                        changeGrid={changeGrid}
-                    />
-                    <HandSizeSelect
-                        size={size}
-                        minHandSize={minHandSize}
-                        changeHandSize={changeHandSize}
-                    />
+        <>
+            {/* back button */}
+            <button
+                className="home-button"
+                onClick={() => {
+                    navigate("/");
+                }}
+            >
+                🔙
+            </button>
+
+            <form onSubmit={submitHandler}>
+                <div className="Options text-center">
+                    {waiting === true ? (
+                        <div className="OptionsHeader giant_emoji spinner">
+                            {getIcon()}
+                        </div>
+                    ) : (
+                        <div className="OptionsHeader giant_emoji">
+                            {getIcon()}
+                        </div>
+                    )}
+                    {props.mode === "online" && (
+                        <NameEnter
+                            setPlayerName={setPlayerName}
+                            playerName={playerName}
+                        />
+                    )}
+                    <div className="OptionsGrid">
+                        <SizeSelect
+                            size={size}
+                            minBoardSize={minBoardSize}
+                            maxBoardSize={maxBoardSize}
+                            changeGrid={changeGrid}
+                        />
+                        <HandSizeSelect
+                            size={size}
+                            minHandSize={minHandSize}
+                            changeHandSize={changeHandSize}
+                        />
+                    </div>
+                    {props.mode === "cpu" && (
+                        <DifficultySelect
+                            setCpuDifficulty={setCpuDifficulty}
+                            cpuDifficulty={cpuDifficulty}
+                        />
+                    )}
+                    <div className="MenuItems">
+                        <button className="MenuItem btn-success">Start</button>
+                    </div>
                 </div>
-                {props.mode === "cpu" && (
-                    <DifficultySelect
-                        setCpuDifficulty={setCpuDifficulty}
-                        cpuDifficulty={cpuDifficulty}
-                    />
-                )}
-                <div className="MenuItems">
-                    <button className="MenuItem btn-success">Start</button>
-                </div>
-            </div>
-        </form>
+            </form>
+        </>
     );
 };
 
