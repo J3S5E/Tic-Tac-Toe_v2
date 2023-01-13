@@ -64,47 +64,51 @@ async function ProcessMoveCpu(move: any, clientId: string, socketId: string) {
     }
 
     // Get game info from database
-    const storedGame = await CpuGame.findOne({ clientId, gameOver: false });
-    if (!storedGame) {
-        return;
-    }
-
-    if (isMoveValid(storedGame.gameState, move)) {
-        storedGame.gameState = makeMove(storedGame.gameState, move);
-        storedGame.gameOver = checkGameOver(storedGame.gameState);
-        if (storedGame.gameOver) {
-            storedGame.winner = "Player";
+    try {
+        const storedGame = await CpuGame.findOne({ clientId, gameOver: false });
+        if (!storedGame) {
+            return;
         }
-    } else {
+
+        if (isMoveValid(storedGame.gameState, move)) {
+            storedGame.gameState = makeMove(storedGame.gameState, move);
+            storedGame.gameOver = checkGameOver(storedGame.gameState);
+            if (storedGame.gameOver) {
+                storedGame.winner = "Player";
+            }
+        } else {
+            const gameUpdate: GameUpdate = {
+                gameState: storedGame.gameState,
+                isPlayerTurn: true,
+            };
+            io.to(socketId).emit("cpu-game:update", gameUpdate);
+            return;
+        }
+
+        if (!storedGame.gameOver) {
+            // make cpu move
+            storedGame.gameState = makeCpuMove(
+                storedGame.gameState,
+                storedGame.cpuDifficulty
+            );
+            storedGame.gameOver = checkGameOver(storedGame.gameState);
+            if (storedGame.gameOver) {
+                storedGame.winner = "CPU";
+            }
+        }
+
+        // Update game state in database
+        await storedGame.save();
+
+        // Send game state to client
         const gameUpdate: GameUpdate = {
             gameState: storedGame.gameState,
             isPlayerTurn: true,
         };
         io.to(socketId).emit("cpu-game:update", gameUpdate);
-        return;
+    } catch (err) {
+        console.log(err);
     }
-
-    if (!storedGame.gameOver) {
-        // make cpu move
-        storedGame.gameState = makeCpuMove(
-            storedGame.gameState,
-            storedGame.cpuDifficulty
-        );
-        storedGame.gameOver = checkGameOver(storedGame.gameState);
-        if (storedGame.gameOver) {
-            storedGame.winner = "CPU";
-        }
-    }
-
-    // Update game state in database
-    await storedGame.save();
-
-    // Send game state to client
-    const gameUpdate: GameUpdate = {
-        gameState: storedGame.gameState,
-        isPlayerTurn: true,
-    };
-    io.to(socketId).emit("cpu-game:update", gameUpdate);
 }
 
 export { SetupCpuGame, ProcessMoveCpu };
@@ -129,7 +133,11 @@ function getCpuMove(gameState: Game, cpuDifficulty: number): PlayerMove {
     // Try to block win
     const playerWinningMove = canWin(gameState, "blue");
     if (playerWinningMove.result && playerWinningMove.move !== null) {
-        const blockingMove = blockStrategy(gameState, playerWinningMove.move, cpuDifficulty);
+        const blockingMove = blockStrategy(
+            gameState,
+            playerWinningMove.move,
+            cpuDifficulty
+        );
         if (blockingMove !== null) {
             if (isMoveValid(gameState, blockingMove)) {
                 return blockingMove;

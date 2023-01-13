@@ -116,14 +116,19 @@ async function AddPlayerToQueue(
     }
 
     // check if player is already in queue
-    const alreadyInQueue = await InQueue.findOne({ clientId: clientId });
-    if (alreadyInQueue) {
-        alreadyInQueue.socketId = socketId;
-        alreadyInQueue.minHandSize = gameOptions.minHandSize;
-        alreadyInQueue.size = gameOptions.size;
-        alreadyInQueue.name = gameOptions.playerName || "Player " + socketId;
-        await alreadyInQueue.save();
-        return;
+    try {
+        const alreadyInQueue = await InQueue.findOne({ clientId: clientId });
+        if (alreadyInQueue) {
+            alreadyInQueue.socketId = socketId;
+            alreadyInQueue.minHandSize = gameOptions.minHandSize;
+            alreadyInQueue.size = gameOptions.size;
+            alreadyInQueue.name = gameOptions.playerName || "Player " + socketId;
+            await alreadyInQueue.save();
+            return;
+        }
+    }
+    catch (err) {
+        console.log(err);
     }
 
     // add player to queue
