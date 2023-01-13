@@ -1,6 +1,8 @@
 events {}
 http {
 
+    access_log off;
+
     server {
         listen       80;
         listen  [::]:80;
