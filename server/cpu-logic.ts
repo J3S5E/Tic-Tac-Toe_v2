@@ -190,7 +190,7 @@ function getRandomMove(gameState: Game): PlayerMove {
 }
 
 function getRandomPiece(): GamePiece {
-    const pieces: GamePiece[] = ["🗻", "📰", "✂"];
+    const pieces: GamePiece[] = ["🪨", "📰", "✂"];
     const index = Math.floor(Math.random() * pieces.length);
     return pieces[index];
 }
@@ -297,14 +297,14 @@ function blockStrategy(
     if (currentValue !== null) {
         let action: GamePiece = "📰";
         switch (currentValue) {
-            case "🗻":
+            case "🪨":
                 action = "📰";
                 break;
             case "📰":
                 action = "✂";
                 break;
             case "✂":
-                action = "🗻";
+                action = "🪨";
                 break;
             default:
                 return null;
@@ -324,11 +324,11 @@ function blockStrategy(
         // see if the winner does not have options
         if (options.length < 3) {
             let action: GamePiece | null = null;
-            if (!("🗻" in options)) {
+            if (!("🪨" in options)) {
                 if (blockerHand.indexOf("✂") !== -1) action = "✂";
             }
             if (!("📰" in options)) {
-                if (blockerHand.indexOf("🗻") !== -1) action = "🗻";
+                if (blockerHand.indexOf("🪨") !== -1) action = "🪨";
             }
             if (!("✂" in options)) {
                 if (blockerHand.indexOf("📰") !== -1) action = "📰";

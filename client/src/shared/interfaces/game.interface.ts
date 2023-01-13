@@ -1,4 +1,4 @@
-type GamePiece = "🗻" | "📰" | "✂"
+type GamePiece = "🪨" | "📰" | "✂"
 type GameColor = "red" | "blue"
 
 interface BoardSpace {
