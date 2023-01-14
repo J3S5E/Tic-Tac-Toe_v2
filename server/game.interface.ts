@@ -42,6 +42,8 @@ interface GameOptions {
 interface GameUpdate {
     gameState: Game;
     isPlayerTurn: boolean;
+    gameOver: boolean;
+    winner?: string;
 }
 
 export { Game, BoardSpace, GameBoard, Player, PlayerMove, GameOptions, GamePiece, GameColor, GameUpdate };

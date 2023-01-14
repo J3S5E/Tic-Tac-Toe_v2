@@ -60,6 +60,8 @@ async function ProcessPlayerMove(
         const playerGameUpdate: GameUpdate = {
             gameState: gameState,
             isPlayerTurn: true,
+            gameOver: storedGame.gameOver,
+            winner: storedGame.winner
         };
         io.to(socketId).emit("online-game:update", playerGameUpdate);
         return;
@@ -73,10 +75,15 @@ async function ProcessPlayerMove(
     const playerGameUpdate: GameUpdate = {
         gameState: gameState,
         isPlayerTurn: false,
+        gameOver: storedGame.gameOver,
+        winner: storedGame.winner
+        
     };
     const opponentGameUpdate: GameUpdate = {
         gameState: gameState,
         isPlayerTurn: true,
+        gameOver: storedGame.gameOver,
+        winner: storedGame.winner
     };
     const opponentSocketId = isPlayer1
         ? storedGame.player2SocketId
@@ -104,6 +111,8 @@ async function AddPlayerToQueue(
         const playerGameUpdate: GameUpdate = {
             gameState: storedGame.gameState,
             isPlayerTurn: playerColor === storedGame.gameState.currentPlayer,
+            gameOver: storedGame.gameOver,
+            winner: storedGame.winner
         };
         if (storedGame.player1Id === clientId) {
             storedGame.player1SocketId = socketId;
@@ -142,7 +151,59 @@ async function AddPlayerToQueue(
     inQueue.save();
 }
 
-export { ProcessPlayerMove, AddPlayerToQueue };
+async function SendGameStatus(clientId: string, socketId: string) {
+    const ongoingGames = await OnlineGame.find({ gameOver: false });
+
+    // find if there is a game that the player is in
+    const storedGame = ongoingGames.find((game) => {
+        return game.player1Id === clientId || game.player2Id === clientId;
+    });
+
+    // if the player is already in a game, send them the game state
+    if (storedGame) {
+        const playerColor = storedGame.player1Id === clientId ? "red" : "blue";
+        const playerGameUpdate: GameUpdate = {
+            gameState: storedGame.gameState,
+            isPlayerTurn: playerColor === storedGame.gameState.currentPlayer,
+            gameOver: storedGame.gameOver,
+            winner: storedGame.winner
+        };
+        if (storedGame.player1Id === clientId) {
+            storedGame.player1SocketId = socketId;
+        } else {
+            storedGame.player2SocketId = socketId;
+        }
+        await storedGame.save();
+        io.to(socketId).emit("online-game:update", playerGameUpdate);
+        return;
+    } else {
+        const allGames = await OnlineGame.find({}).sort({ updatedAt: -1 });
+
+        const storedGame = allGames.find((game) => {
+            return game.player1Id === clientId || game.player2Id === clientId;
+        });
+
+        if (storedGame) {
+            const playerColor = storedGame.player1Id === clientId ? "red" : "blue";
+            const playerGameUpdate: GameUpdate = {
+                gameState: storedGame.gameState,
+                isPlayerTurn: playerColor === storedGame.gameState.currentPlayer,
+                gameOver: storedGame.gameOver,
+                winner: storedGame.winner
+            };
+            if (storedGame.player1Id === clientId) {
+                storedGame.player1SocketId = socketId;
+            } else {
+                storedGame.player2SocketId = socketId;
+            }
+            await storedGame.save();
+            io.to(socketId).emit("online-game:update", playerGameUpdate);
+            return;
+        }
+    }
+}
+
+export { ProcessPlayerMove, AddPlayerToQueue, SendGameStatus };
 
 
 schedule("*/10 * * * * *", async function () {
@@ -175,11 +236,13 @@ schedule("*/10 * * * * *", async function () {
                 await onlineGame.save();
                 const player1GameUpdate: GameUpdate = {
                     gameState: game,
-                    isPlayerTurn: "red" === game.currentPlayer
+                    isPlayerTurn: "red" === game.currentPlayer,
+                    gameOver: false
                 };
                 const player2GameUpdate: GameUpdate = {
                     gameState: game,
-                    isPlayerTurn: "blue" === game.currentPlayer
+                    isPlayerTurn: "blue" === game.currentPlayer,
+                    gameOver: false
                 };
                 io.to(player1.socketId).emit("online-game:update", player1GameUpdate);
                 io.to(player2.socketId).emit("online-game:update", player2GameUpdate);
@@ -207,7 +270,7 @@ schedule("*/30 * * * * *", async function () {
     // end the games
     for (const game of inactiveGames) {
         game.gameOver = true;
-        const winner = game.gameState.currentPlayer === "red" ? game.gameState.player2.label : game.gameState.player1.label;
+        const winner = game.gameState.currentPlayer === "red" ? game.gameState.player1.label : game.gameState.player2.label;
         game.winner = winner;
         await game.save();
     }

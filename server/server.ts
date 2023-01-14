@@ -9,8 +9,8 @@ if (!databaseUrl) {
 }
 
 import { GameOptions, PlayerMove } from "./game.interface";
-import { ProcessMoveCpu, SetupCpuGame } from "./cpu-logic.js";
-import { AddPlayerToQueue, ProcessPlayerMove } from "./online-logic.js";
+import { AddPlayerToQueue, ProcessPlayerMove, SendGameStatus } from "./online-logic.js";
+import { ProcessMoveCpu, SetupCpuGame, SendCpuGameStatus } from "./cpu-logic.js";
 
 const PORT = Number(process.env.SOCKET_PORT || "4242");
 
@@ -49,12 +49,20 @@ io.on("connection", (socket) => {
         ProcessPlayerMove(move, clientId, socketId);
     });
 
+    socket.on("online-game:check-status", () => {
+        SendGameStatus(clientId, socketId);
+    });
+
     socket.on("cpu-game:start", (gameOptions: GameOptions) => {
         SetupCpuGame(gameOptions, clientId, socketId);
     });
 
     socket.on("cpu-game:move", (move: PlayerMove) => {
         ProcessMoveCpu(move, clientId, socketId);
+    });
+
+    socket.on("cpu-game:check-status", () => {
+        SendCpuGameStatus(clientId, socketId);
     });
 });
 

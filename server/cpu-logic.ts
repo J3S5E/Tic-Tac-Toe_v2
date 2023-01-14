@@ -53,11 +53,35 @@ async function SetupCpuGame(
     const gameUpdate: GameUpdate = {
         gameState,
         isPlayerTurn: true,
+        gameOver: false,
     };
     io.to(socketId).emit("cpu-game:update", gameUpdate);
 }
 
-async function ProcessMoveCpu(move: any, clientId: string, socketId: string) {
+async function SendCpuGameStatus(clientId: string, socketId: string) {
+    try {
+        // find games and sort by last modified
+        const playerGames = await CpuGame.find({ clientId }).sort({
+            updatedAt: -1,
+        });
+
+        const storedGame = playerGames[0];
+
+        // Send game state to client
+        const gameUpdate: GameUpdate = {
+            gameState: storedGame.gameState,
+            isPlayerTurn: storedGame.gameState.currentPlayer === "blue",
+            gameOver: storedGame.gameOver,
+            winner: storedGame.winner
+        };
+
+        io.to(socketId).emit("cpu-game:update", gameUpdate);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+async function ProcessMoveCpu(move: PlayerMove, clientId: string, socketId: string) {
     // check that is a player move
     if (move.player !== "blue") {
         return;
@@ -80,6 +104,8 @@ async function ProcessMoveCpu(move: any, clientId: string, socketId: string) {
             const gameUpdate: GameUpdate = {
                 gameState: storedGame.gameState,
                 isPlayerTurn: true,
+                gameOver: storedGame.gameOver,
+                winner: storedGame.winner,
             };
             io.to(socketId).emit("cpu-game:update", gameUpdate);
             return;
@@ -104,6 +130,8 @@ async function ProcessMoveCpu(move: any, clientId: string, socketId: string) {
         const gameUpdate: GameUpdate = {
             gameState: storedGame.gameState,
             isPlayerTurn: true,
+            gameOver: storedGame.gameOver,
+            winner: storedGame.winner,
         };
         io.to(socketId).emit("cpu-game:update", gameUpdate);
     } catch (err) {
@@ -111,7 +139,7 @@ async function ProcessMoveCpu(move: any, clientId: string, socketId: string) {
     }
 }
 
-export { SetupCpuGame, ProcessMoveCpu };
+export { SetupCpuGame, ProcessMoveCpu, SendCpuGameStatus };
 
 ///// Local Functions
 

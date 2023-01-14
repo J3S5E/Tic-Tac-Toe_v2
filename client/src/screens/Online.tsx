@@ -14,6 +14,7 @@ function Online() {
     const [gameOptions, setGameOptions] = useState<GameOptions | null>(null);
     const [gameState, setGameState] = useState<Game | null>(null);
     const [waiting, setWaiting] = useState<boolean>(false);
+    const [winner, setWinner] = useState<string | null>(null);
 
     const socket = useSocket();
 
@@ -24,10 +25,13 @@ function Online() {
         socket.on("online-game:update", (update: GameUpdate) => {
             const { gameState, isPlayerTurn } = update;
             setGameState(gameState);
-            if (isPlayerTurn) {
+            if (isPlayerTurn || update.winner) {
                 setWaiting(false);
             } else {
                 setWaiting(true);
+            }
+            if (update.winner) {
+                setWinner(update.winner);
             }
         });
         return () => {
@@ -57,7 +61,18 @@ function Online() {
         setGameOptions(null);
         setGameState(null);
         setWaiting(false);
+        setWinner(null);
     }
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (gameOptions !== null && socket !== null && waiting === true) {
+                console.log("Checking status");
+                socket?.emit("online-game:check-status");
+            }
+        }, 15000);
+        return () => clearInterval(interval);
+    }, [gameOptions, socket, waiting]);
 
     return (
         <>
@@ -73,6 +88,7 @@ function Online() {
                     handleMove={handleMove}
                     waiting={waiting}
                     reset={reset}
+                    winner={winner}
                 />
             )}
         </>

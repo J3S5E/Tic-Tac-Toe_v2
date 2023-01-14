@@ -11,15 +11,20 @@ const GameInstance = (props: {
     handleMove: (move: PlayerMove) => void;
     waiting: boolean;
     reset: () => void;
+    winner: null | string;
 }) => {
     const { gameState, handleMove, waiting, reset } = props;
 
     const { board, player1, player2, currentPlayer } = gameState;
 
     const [selected, setSelected] = useState<number | null>(null);
-    const [zoom, setZoom] = useLocalStorage<number>("zoom",5);
+    const [zoom, setZoom] = useLocalStorage<number>("zoom", 5);
 
-    const { gameOver, winner } = isGameOver(gameState);
+    const localGameOver = isGameOver(gameState);
+    const onlineGameOver = props.winner;
+
+    const winner = onlineGameOver || localGameOver.winner;
+    const gameOver = winner !== null || localGameOver.gameOver;
 
     function getWinnerLabel(): string {
         if (winner === null) {

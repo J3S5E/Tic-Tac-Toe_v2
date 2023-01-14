@@ -41,6 +41,7 @@ function Local() {
                     handleMove={handleMove}
                     waiting={false}
                     reset={reset}
+                    winner={null}
                 />
             )}
         </>
