@@ -66,11 +66,17 @@ function Cpu() {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            if (gameOptions !== null && socket !== null && waiting === true)
+            if (
+                gameState !== null &&
+                gameOptions !== null &&
+                socket !== null &&
+                waiting === true
+            ) {
                 socket?.emit("cpu-game:check-status");
+            }
         }, 15000);
         return () => clearInterval(interval);
-    }, [gameOptions, socket, waiting]);
+    }, [gameOptions, gameState, socket, waiting]);
 
     return (
         <>

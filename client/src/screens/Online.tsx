@@ -66,13 +66,17 @@ function Online() {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            if (gameOptions !== null && socket !== null && waiting === true) {
-                console.log("Checking status");
+            if (
+                gameState !== null &&
+                gameOptions !== null &&
+                socket !== null &&
+                waiting === true
+            ) {
                 socket?.emit("online-game:check-status");
             }
         }, 15000);
         return () => clearInterval(interval);
-    }, [gameOptions, socket, waiting]);
+    }, [gameOptions, gameState, socket, waiting]);
 
     return (
         <>
