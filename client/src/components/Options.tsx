@@ -135,7 +135,9 @@ const Options = (props: OptionsProps) => {
                         />
                     )}
                     <div className="MenuItems">
-                        <button className="MenuItem btn-success">Start</button>
+                        <button className="MenuItem btn-success">
+                            {waiting === true ? "Waiting..." : "Start"}
+                        </button>
                     </div>
                 </div>
             </form>
