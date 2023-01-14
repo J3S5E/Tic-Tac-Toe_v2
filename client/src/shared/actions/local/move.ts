@@ -113,4 +113,29 @@ function getRandomPiece(): GamePiece {
     return pieces[index];
 }
 
-export { HandleMove , isValidMove };
+function updateBoard(move: PlayerMove, gameState: Game): Game {
+    // change currentPlayer
+    gameState.currentPlayer =
+        gameState.currentPlayer === "red" ? "blue" : "red";
+
+    // update board
+    gameState.board[move.row][move.col].color = move.player;
+    gameState.board[move.row][move.col].value = move.action;
+
+    // remove piece from hand
+    if (gameState.player1.color === move.player) {
+        // remove a single piece from the hand
+        if (move.index < gameState.player1.hand.length && move.index >= 0) {
+            gameState.player1.hand.splice(move.index, 1);
+        } else {
+            const index = gameState.player1.hand.indexOf(move.action);
+            if (index > -1) {
+                gameState.player1.hand.splice(index, 1);
+            }
+        }
+    }
+
+    return gameState;
+}
+
+export { HandleMove , isValidMove, updateBoard };
