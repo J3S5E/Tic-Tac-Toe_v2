@@ -9,7 +9,7 @@ const MainMenu = () => {
         <>
             <div className="Menu text-center">
                 <div className="MenuHeader GameTitle">
-                    ⛰📰✂<br></br>
+                    🪨📰✂<br></br>
                     ❌'s and ⭕'s
                 </div>
                 <div className="MenuItems">
