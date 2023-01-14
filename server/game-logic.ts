@@ -11,7 +11,7 @@ import {
 function randomStartingHand(handSize: number): GamePiece[] {
     const newHand: GamePiece[] = [];
     // add the different pieces to the hand
-    newHand.push("🪨");
+    newHand.push("🗻");
     newHand.push("📰");
     newHand.push("✂");
 
@@ -24,7 +24,7 @@ function randomStartingHand(handSize: number): GamePiece[] {
 }
 
 function getRandomPiece(): GamePiece {
-    const pieces: GamePiece[] = ["🪨", "📰", "✂"];
+    const pieces: GamePiece[] = ["🗻", "📰", "✂"];
     const index = Math.floor(Math.random() * pieces.length);
     return pieces[index];
 }
@@ -206,12 +206,12 @@ export { makeGame, isMoveValid, makeMove, checkGameOver };
 
 function doesThisBeatThat(thisPiece: GamePiece, thatPiece: GamePiece): boolean {
     if (thisPiece === "📰") {
-        if (thatPiece === "🪨") {
+        if (thatPiece === "🗻") {
             return true;
         } else {
             return false;
         }
-    } else if (thisPiece === "🪨") {
+    } else if (thisPiece === "🗻") {
         if (thatPiece === "✂") {
             return true;
         } else {
