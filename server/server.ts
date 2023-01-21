@@ -30,10 +30,12 @@ mongoose.connect(databaseUrl)
 // set up socket.io
 const io = new Server(PORT, {
     cors: {
-        origin: "*",
+        origin: process.env.WEB_CLIENT_URL || "*",
         methods: ["GET", "POST"]
     }
 });
+
+console.log(`Cross-Origin Resource Sharing (CORS) enabled for ${process.env.WEB_CLIENT_URL || "*"}`);
 
 // listen for new connections with Ids
 io.on("connection", (socket) => {
