@@ -67,6 +67,10 @@ async function SendCpuGameStatus(clientId: string, socketId: string) {
 
         const storedGame = playerGames[0];
 
+        if (storedGame === undefined) {
+            return;
+        }
+
         // Send game state to client
         const gameUpdate: GameUpdate = {
             gameState: storedGame.gameState,

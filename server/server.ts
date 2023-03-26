@@ -1,7 +1,9 @@
 import { Server } from "socket.io";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import express from "express";
 dotenv.config()
+const app = express();
 
 const databaseUrl = process.env.NODE_ENV === 'production' ? process.env.DATABASE_URL : process.env.DATABASE_DEV_URL;
 if (!databaseUrl) {
@@ -12,7 +14,9 @@ import { GameOptions, PlayerMove } from "./game.interface";
 import { AddPlayerToQueue, ProcessPlayerMove, SendGameStatus } from "./online-logic.js";
 import { ProcessMoveCpu, SetupCpuGame, SendCpuGameStatus } from "./cpu-logic.js";
 
-const PORT = Number(process.env.SOCKET_PORT || "4242");
+const SOCKET_PORT = Number(process.env.SOCKET_PORT || "4242");
+const EXT_SOCKET_PORT = Number(process.env.EXT_SOCKET_PORT || "4242");
+const WEB_PORT = Number(process.env.WEB_PORT || "3001");
 
 mongoose.set('strictQuery', false);
 
@@ -28,7 +32,7 @@ mongoose.connect(databaseUrl)
 
 
 // set up socket.io
-const io = new Server(PORT, {
+const io = new Server(SOCKET_PORT, {
     cors: {
         origin: process.env.WEB_CLIENT_URL || "*",
         methods: ["GET", "POST"]
@@ -39,6 +43,8 @@ console.log(`Cross-Origin Resource Sharing (CORS) enabled for ${process.env.WEB_
 
 // listen for new connections with Ids
 io.on("connection", (socket) => {
+    console.log("New connection", socket.id);
+    io.on('error', console.error);
     const clientId = socket.handshake.auth.id;
     const socketId = socket.id;
     console.log(`New connection`, clientId);
@@ -68,5 +74,14 @@ io.on("connection", (socket) => {
     });
 });
 
+io.on('error', console.error);
+
+app.get("/api/port", (req, res) => {
+    res.send(EXT_SOCKET_PORT.toString());
+});
+
+app.listen(WEB_PORT, () => {
+    console.log(`Server running on port ${WEB_PORT}`);
+});
 
 export default io;
