@@ -8,7 +8,9 @@ http {
         listen  [::]:80;
         server_name  localhost;
 
-        large_client_header_buffers 8 64k;
+        location /api/ {
+            proxy_pass http://server:3001/api/;
+        }
 
         location / {
             proxy_pass http://client:3000/;

@@ -28,6 +28,10 @@ jobs:
           context: server/
           tags: j3s5e/ttt-server:latest
           push: true
-          secrets: |
-            "DATABASE_URL=${{ secrets.DATABASE_URL }}"
-            WEB_CLIENT_URL=${{ secrets.WEB_CLIENT_URL }}"
+      -
+        name: Build
+        uses: docker/build-push-action@v3
+        with:
+          context: client/
+          tags: j3s5e/ttt-client:latest
+          push: true
