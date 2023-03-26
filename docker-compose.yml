@@ -20,11 +20,10 @@ services:
       - ./server:/app
     ports:
       - "${SOCKET_PORT}:4242"
-    env_file:
-      - server.env
     environment:
-      - NODE_ENV=production
       - EXT_SOCKET_PORT=${SOCKET_PORT}
+      - DATABASE_URL=${DATABASE_URL}
+      - WEB_CLIENT_URL=${WEB_CLIENT_URL}
 
   nginx:
     image: nginx

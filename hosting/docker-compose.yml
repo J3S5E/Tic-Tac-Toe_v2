@@ -12,6 +12,8 @@ services:
       - server.env
     environment:
       - EXT_SOCKET_PORT=${SOCKET_PORT}
+      - DATABASE_URL=${DATABASE_URL}
+      - WEB_CLIENT_URL=${WEB_CLIENT_URL}
 
   nginx:
     image: nginx
